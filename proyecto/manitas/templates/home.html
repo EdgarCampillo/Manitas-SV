@@ -1,10 +1,9 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
 
-<!-- ================================
-           HERO / BANNER
-=================================== -->
-<!-- HERO PRINCIPAL -->
+
+<!-- Banner PRINCIPAL -->
 <section class="hero-manitas text-white py-5">
     <div class="container text-center">
 
@@ -24,10 +23,10 @@
             <a href="#" class="btn btn-morado btn-lg fw-bold px-4">Crear Cuenta</a>
         </div>
 
-        <!-- ESPACIO PARA VIDEO / IMAGEN -->
+        <!-- IMAGEN BANNER -->
         <div class="mt-5">
             <div>
-                <img src="Banner inicial.png" alt="banner motivacional">
+                <img src="{% static 'img/Banner inicial.png' %}" alt="banner motivacional" style="max-height: 300px;">
             </div>
         </div>
 
@@ -35,9 +34,7 @@
 </section>
 
 
-<!-- ================================
-            ¿QUÉ ES MANITAS SV?
-=================================== -->
+<!-- ¿QUÉ ES MANITAS SV?-->
 <section class="py-5">
     <div class="container text-center">
         <h2 class="fw-bold mb-3">¿Qué es Manitas SV?</h2>
@@ -52,9 +49,7 @@
     </div>
 </section>
 
-<!-- ================================
-            ¿PARA QUÉ SIRVE?
-=================================== -->
+<!--¿PARA QUÉ SIRVE?-->
 <section class="bg-light py-5">
     <div class="container">
         <h2 class="fw-bold text-center mb-4">¿Para qué sirve este sitio?</h2>
@@ -80,9 +75,7 @@
     </div>
 </section>
 
-<!-- ================================
-            LO QUE APRENDERÁS
-=================================== -->
+<!--LO QUE APRENDERÁS-->
 <section class="py-5">
     <div class="container">
         <h2 class="fw-bold text-center mb-4">¿Qué aprenderás aquí?</h2>
@@ -113,9 +106,7 @@
     </div>
 </section>
 
-<!-- ================================
-          PASOS PARA USAR MANITAS SV
-=================================== -->
+<!--PASOS PARA USAR MANITAS SV-->
 <section class="bg-light py-5">
     <div class="container text-center">
 
@@ -151,9 +142,7 @@
     </div>
 </section>
 
-<!-- ================================
-              BENEFICIOS
-=================================== -->
+<!--BENEFICIOS-->
 <section class="py-5">
     <div class="container text-center">
         <h2 class="fw-bold mb-3">Beneficios del sitio</h2>
@@ -184,9 +173,7 @@
     </div>
 </section>
 
-<!-- ================================
-              TESTIMONIOS
-=================================== -->
+<!--TESTIMONIOS-->
 <section class="bg-light py-5">
     <div class="container text-center">
         <h2 class="fw-bold mb-4">Testimonios</h2>
@@ -218,16 +205,11 @@
     </div>
 </section>
 
-<!-- ================================
-        FRASE SALVADOREÑA
-=================================== -->
 <section class="py-5 text-center">
     <h2 class="fw-bold">“Ponete pilas y aprendé a comunicarte con tus manos 🇸🇻🤟”</h2>
 </section>
 
-<!-- ================================
-          LLAMADO A LA ACCIÓN
-=================================== -->
+<!--LLAMADO A LA ACCIÓN-->
 <section class="bg-primary text-white text-center py-5">
     <h2 class="fw-bold mb-3">¡Comenzá hoy!</h2>
     <p class="lead mb-4">Una seña a la vez, hacemos El Salvador más inclusivo.</p>
