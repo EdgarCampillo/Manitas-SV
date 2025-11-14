@@ -1,0 +1,212 @@
+/* --- Tipografía general --- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f6fa;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+/* --- Navbar personalizado --- */
+.navbar {
+    background: #090040 !important;
+}
+
+.navbar-brand {
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+}
+
+.nav-link {
+    font-size: 1rem;
+    margin-left: 10px;
+    transition: 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #0dcaf0 !important;
+    transform: translateY(-2px);
+}
+
+/* --- TÍTULOS IMPORTANTES --- */
+h1, h2, h3 {
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+/* --- Secciones con tarjetas --- */
+.card {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    transition: 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+
+/* --- Botones personalizados --- */
+.btn-aprende {
+    background: #0275d8;
+    color: white;
+    border-radius: 25px;
+    padding: 8px 18px;
+    transition: 0.3s ease;
+}
+
+.btn-aprende:hover {
+    background: #025aa5;
+    transform: scale(1.05);
+    color: white;
+}
+
+/* --- Diccionario imágenes/videos --- */
+.sign-card {
+    text-align: center;
+    padding: 20px;
+}
+
+.sign-card img, 
+.sign-card video {
+    width: 100%;
+    max-height: 220px;
+    object-fit: contain;
+}
+
+/* --- Footer --- */
+.footer-custom {
+    background-color: #090040 !important;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.footer-custom h6 {
+    font-size: 1.2rem; /* título más grande */
+}
+
+.footer-custom p {
+    font-size: 0.9rem;
+    margin: 3px 0;
+}
+
+.footer-custom i {
+    margin-right: 6px;
+    font-size: 1rem;
+}
+
+
+/* --- Formularios --- */
+.form-control {
+    border-radius: 10px;
+    padding: 10px;
+}
+
+input:focus, textarea:focus {
+    border-color: #0dcaf0 !important;
+    box-shadow: 0 0 5px rgba(13, 202, 240, 0.5) !important;
+}
+
+/* --- Header hero (opcional) --- */
+.hero {
+    background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+                url('../img/hero-lessa.jpg') center/cover no-repeat;
+    padding: 80px 0;
+    text-align: center;
+    color: white;
+    border-radius: 20px;
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    max-width: 700px;
+    margin: 10px auto;
+}
+
+/* --- Animaciones suaves --- */
+.fade-in {
+    animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+    }
+}
+
+footer.bg-dark {
+    background-color: #090040 !important;
+}
+
+/* HERO COMPLETAMENTE EXTENDIDO */
+.hero-manitas {
+    background: linear-gradient(
+        rgba(9, 0, 64, 0.7), 
+        rgba(9, 0, 64, 0.7)
+    ),
+    #303481; /* Azul gris */
+    width: 100%;
+    min-height: 420px;
+    padding: 80px 0;
+}
+
+/* Imagen o video del hero */
+.hero-media img, 
+.hero-media video {
+    max-width: 650px;
+    width: 100%;
+    border-radius: 15px;
+}
+
+/* BOTONES */
+.btn-amarillo {
+    background: #FFCC00;
+    color: #090040;
+    border-radius: 30px;
+    transition: 0.3s;
+}
+.btn-amarillo:hover {
+    background: #FFF200;
+    transform: scale(1.05);
+}
+
+/* Botón Morado Relleno */
+.btn-morado {
+    background: #471396;
+    color: white;
+    border-radius: 30px;
+    transition: 0.3s;
+}
+.btn-morado:hover {
+    background: #B13BFF;
+    transform: scale(1.05);
+}
+
+/* Botón Morado Outline */
+.btn-morado-outline {
+    border: 2px solid #FFFFFF;
+    color: white;
+    border-radius: 30px;
+    transition: 0.3s;
+}
+.btn-morado-outline:hover {
+    background: #471396;
+    color: white;
+    transform: scale(1.05);
+}
+
