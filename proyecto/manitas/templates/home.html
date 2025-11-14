@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-
 {% block content %}
 
 <!-- ================================
@@ -21,7 +20,7 @@
         <!-- BOTONES -->
         <div class="d-flex justify-content-center flex-wrap gap-3 mt-4">
             <a href="#" class="btn btn-amarillo btn-lg fw-bold px-4">Aprender ahora</a>
-            <a href="#" class="btn btn-morado-outline btn-lg fw-bold px-4">Diccionario de Señas</a>
+            <a href="{% url 'diccionario_visual' %}" class="btn btn-morado-outline btn-lg fw-bold px-4">Diccionario de Señas</a>
             <a href="#" class="btn btn-morado btn-lg fw-bold px-4">Crear Cuenta</a>
         </div>
 
