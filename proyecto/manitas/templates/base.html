@@ -55,7 +55,7 @@
 
         {% if user.is_authenticated %}
         <li class="nav-item">
-          <a class="nav-link text-warning" href="">Cerrar sesión</a>
+          <a class="nav-link text-warning" href="{% url 'logout' %}">Cerrar sesión</a>
         </li>
         {% else %}
         <li class="nav-item">
