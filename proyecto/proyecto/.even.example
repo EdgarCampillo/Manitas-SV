@@ -1,0 +1,10 @@
+# Base de datos Supabase
+DB_NAME=postgres
+DB_USER=tu_usuario_supabase
+DB_PASSWORD=tu_password_supabase
+DB_HOST=tu_host.supabase.co
+DB_PORT=5432
+
+# Google OAuth
+GOOGLE_OAUTH2_KEY=tu_client_id_google
+GOOGLE_OAUTH2_SECRET=tu_client_secret_google
