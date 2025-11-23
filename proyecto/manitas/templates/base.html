@@ -22,7 +22,7 @@
   <div class="container">
 
     <a class="navbar-brand fw-bold" href="{% url 'home' %}">
-      <img src="{% static 'img/Icono_logo.png' %}" alt="Logo" 
+      <img src="{% static 'img/Icono sin fondo.png' %}" alt="Logo" 
          style="height: 50px; margin-right: 1px;">
         Manitas SV
     </a>
@@ -46,16 +46,16 @@
           <a class="nav-link" href="">Ejercicios</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="">Nosotros</a>
+          <a class="nav-link" href="{% url 'nosotros' %}">Nosotros</a>
         </li>
 
         <li class="nav-item">
-          <a class="nav-link" href="">Contacto</a>
+          <a class="nav-link" href="{% url 'contacto' %}">Contacto</a>
         </li>
 
         {% if user.is_authenticated %}
         <li class="nav-item">
-          <a class="nav-link text-warning" href="">Cerrar sesión</a>
+          <a class="nav-link text-warning" href="{% url 'logout' %}">Cerrar sesión</a>
         </li>
         {% else %}
         <li class="nav-item">
