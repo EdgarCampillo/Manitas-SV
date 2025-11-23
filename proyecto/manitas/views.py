@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
 from .forms import RegistroForm
 from django.contrib import messages
 from social_django.models import UserSocialAuth
-
+from django.contrib.auth.decorators import login_required
+from .forms import PerfilForm
+from .models import Perfil
 
 
 # Create your views here.
@@ -58,6 +60,21 @@ def registrate_google(request):
         form = RegistroForm(initial={'email': email, 'nombre_completo': nombre})
 
     return render(request, 'registrate_google.html', {'form': form})
+
+@login_required
+def perfil_view(request):
+    user = request.user
+    perfil, created = Perfil.objects.get_or_create(user=user)
+
+    if request.method == 'POST':
+        form = PerfilForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('perfil')
+    else:
+        form = PerfilForm(instance=user)
+
+    return render(request, 'perfil.html', {'form': form, 'perfil': perfil})
 
 def login_view(request):
     if request.method == 'POST':

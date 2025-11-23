@@ -2,17 +2,16 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title|default:"Manitas SV" }}</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title|default:"Manitas SV" }}</title>
 
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-
-    <!-- CSS Personalizado -->
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <!-- CSS Personalizado -->
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 
 <body>
@@ -20,11 +19,9 @@
 <!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
   <div class="container">
-
     <a class="navbar-brand fw-bold" href="{% url 'home' %}">
-      <img src="{% static 'img/Icono sin fondo.png' %}" alt="Logo" 
-         style="height: 50px; margin-right: 1px;">
-        Manitas SV
+      <img src="{% static 'img/Icono sin fondo.png' %}" alt="Logo" style="height: 50px; margin-right: 1px;">
+      Manitas SV
     </a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -33,125 +30,113 @@
 
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="{% url 'lecciones' %}">Lecciones</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'diccionario_visual' %}">Diccionario Visual</a></li>
+        <li class="nav-item"><a class="nav-link" href="">Ejercicios</a></li>
+        <li class="nav-item"><a class="nav-link" href="">Nosotros</a></li>
+        <li class="nav-item"><a class="nav-link" href="">Contacto</a></li>
 
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'lecciones' %}">Lecciones</a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'diccionario_visual' %}">Diccionario Visual</a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" href="">Ejercicios</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="">Nosotros</a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" href="">Contacto</a>
-        </li>
-
-        {% if user.is_authenticated %}
-        <li class="nav-item">
-          <a class="nav-link text-warning" href="{% url 'logout' %}">Cerrar sesión</a>
-        </li>
-        {% else %}
-        <li class="nav-item">
-          <a class="nav-link text-info" href="{% url 'login' %}">Ingresar</a>
-        </li>
+        {% if not user.is_authenticated %}
+          <li class="nav-item"><a class="nav-link text-info" href="{% url 'login' %}">Ingresar</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'registrate' %}">Regístrate</a></li>
         {% endif %}
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'registrate' %}">Regístrate</a>
-        </li>
-
       </ul>
     </div>
-
   </div>
 </nav>
 
+<!-- FOTO DE PERFIL EN ESQUINA -->
+{% if user.is_authenticated %}
+<div class="user-profile-trigger" onclick="toggleUserPanel()">
+  {% if user.perfil.image %}
+    <img src="{{ user.perfil.image.url }}" alt="Foto de perfil" class="user-profile-pic">
+  {% else %}
+    <img src="{% static 'img/perfil.png' %}" alt="Foto de perfil" class="user-profile-pic">
+  {% endif %}
+</div>
+
+<!-- PANEL LATERAL -->
+<div id="user-panel" class="user-panel hidden">
+
+  <div class="user-panel-header d-flex justify-content-between align-items-center">
+    <button class="btn-close ms-2" onclick="toggleUserPanel()"></button>
+    <h5 class="flex-grow-1 text-center m-0">Perfil</h5>
+  </div>
+  <div class="user-panel-body d-flex flex-column align-items-center text-center">
+    {% if user.perfil.image %}
+      <img src="{{ user.perfil.image.url }}" alt="Foto de perfil" class="user-panel-pic">
+    {% else %}
+      <img src="{% static 'img/perfil.png' %}" alt="Foto de perfil" class="user-panel-pic">
+    {% endif %}
+    <p><strong>Nombre:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+    <p><strong>Usuario:</strong> {{ user.username }}</p>
+    <a href="{% url 'perfil' %}" class="btn btn-outline-primary w-100 mb-2">Editar perfil</a>
+    <a href="{% url 'logout' %}" class="btn btn-outline-warning w-100">Cerrar sesión</a>
+  </div>
+</div>
+{% endif %}
+
 <!-- CONTENIDO PRINCIPAL -->
 <main class="container mt-4 mb-4">
-    {% block content %}
-    {% endblock %}
+  {% block content %}
+  {% endblock %}
 </main>
 
 <!-- FOOTER -->
 <footer class="bg-dark text-white pt-4 pb-2 mt-auto">
-    <div class="container text-center text-md-start">
+  <div class="container text-center text-md-start">
+    <div class="row">
+      <div class="col-md-4 mb-3 text-center text-md-start">
+        <img src="{% static 'img/icono sin fondo.png' %}" alt="Logo Manitas Sv" style="width: 100px;" class="mb-2">
+        <h5 class="fw-bold">Manitas SV</h5>
+        <p class="small">Proyecto educativo para promover la inclusión mediante el Lenguaje de Señas Salvadoreño 🤟🇸🇻</p>
+      </div>
 
-        <div class="row">
+      <div class="col-md-4 mb-3 text-center text-md-start">
+        <h5 class="fw-bold mb-3" style="font-size: 1.3rem;">Contacto</h5>
+        <p class="mb-1"><i class="bi bi-envelope-fill"></i> manitasSV@gmail.com</p>
+        <p class="mb-1"><i class="bi bi-person-fill"></i> Desarrollado por: <strong>Manitas Team</strong></p>
+        <p class="mb-0"><i class="bi bi-geo-alt-fill"></i> San Miguel, El Salvador</p>
+      </div>
 
-            <!-- LOGO + DESCRIPCIÓN -->
-            <div class="col-md-4 mb-3 text-center text-md-start">
-                <img src="{% static 'img/icono sin fondo.png' %}" alt="Logo Manitas Sv" 
-                     style="width: 100px;" class="mb-2">
-                <h5 class="fw-bold">Manitas SV</h5>
-                <p class="small">
-                    Proyecto educativo para promover la inclusión mediante el 
-                    Lenguaje de Señas Salvadoreño 🤟🇸🇻
-                </p>
-            </div>
-
-            <!-- CONTACTO -->
-            <div class="col-md-4 mb-3 text-center text-md-start">
-              <h5 class="fw-bold mb-3" style="font-size: 1.3rem;">Contacto</h5>
-                <p class="mb-1">
-                    <i class="bi bi-envelope-fill"></i>
-                    manitasSV@gmail.com
-                </p>
-                <p class="mb-1">
-                    <i class="bi bi-person-fill"></i>
-                    Desarrollado por: <strong>Manitas Team</strong>
-                </p>
-                <p class="mb-0">
-                    <i class="bi bi-geo-alt-fill"></i>
-                    San Miguel, El Salvador
-                </p>
-            </div>
-
-            <!-- REDES SOCIALES -->
-          <div class="col-md-4 mb-3 text-center text-md-start">
-              <h5 class="fw-bold mb-3">Síguenos</h5>
-
-              <div class="d-flex flex-column small">
-                  <a href="#" class="text-white text-decoration-none mb-2">
-                      <i class="bi bi-facebook me-2"></i> Facebook
-                  </a>
-
-                  <a href="#" class="text-white text-decoration-none mb-2">
-                      <i class="bi bi-instagram me-2"></i> Instagram
-                  </a>
-
-                  <a href="#" class="text-white text-decoration-none mb-2">
-                      <i class="bi bi-youtube me-2"></i> YouTube
-                  </a>
-
-                  <a href="#" class="text-white text-decoration-none mb-2">
-                      <i class="bi bi-tiktok me-2"></i> TikTok
-                  </a>
-              </div>
-          </div>
-
-
+      <div class="col-md-4 mb-3 text-center text-md-start">
+        <h5 class="fw-bold mb-3">Síguenos</h5>
+        <div class="d-flex flex-column small">
+          <a href="#" class="text-white text-decoration-none mb-2"><i class="bi bi-facebook me-2"></i> Facebook</a>
+          <a href="#" class="text-white text-decoration-none mb-2"><i class="bi bi-instagram me-2"></i> Instagram</a>
+          <a href="#" class="text-white text-decoration-none mb-2"><i class="bi bi-youtube me-2"></i> YouTube</a>
+          <a href="#" class="text-white text-decoration-none mb-2"><i class="bi bi-tiktok me-2"></i> TikTok</a>
         </div>
-
-        <hr class="border-secondary">
-
-        <div class="text-center small">
-            © 2025 Manitas SV — Todos los derechos reservados.
-        </div>
-
+      </div>
     </div>
+
+    <hr class="border-secondary">
+    <div class="text-center small">© 2025 Manitas SV — Todos los derechos reservados.</div>
+  </div>
 </footer>
 
 <a href="{% url 'home' %}" class="btn btn-primary position-fixed bottom-0 end-0 m-4 shadow rounded-circle" style="z-index: 1000;">
-    <i class="bi bi-house-door-fill fs-4"></i>
+  <i class="bi bi-house-door-fill fs-4"></i>
 </a>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Script para mostrar/ocultar el panel de perfil -->
+<script>
+  function toggleUserPanel() {
+    const panel = document.getElementById('user-panel');
+    panel.classList.toggle('hidden');
+  }
+
+  // Cerrar si se hace clic fuera del panel
+  document.addEventListener('click', function(event) {
+    const panel = document.getElementById('user-panel');
+    const trigger = document.querySelector('.user-profile-trigger');
+    if (panel && trigger && !panel.contains(event.target) && !trigger.contains(event.target)) {
+      panel.classList.add('hidden');
+    }
+  });
+</script>
 </body>
 </html>

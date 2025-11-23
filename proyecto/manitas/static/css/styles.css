@@ -238,3 +238,79 @@ body, html {
 }
 
 
+
+/* Estilos para el panel lateral de perfil */
+.user-profile-trigger {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  width: 44px;
+  height: 44px;
+  z-index: 1050;
+}
+
+.user-profile-pic {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  cursor: pointer;
+}
+
+.user-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 280px;
+  height: 100%;
+  background-color: #f8f9fa;
+  box-shadow: -2px 0 8px rgba(0,0,0,0.2);
+  padding: 20px;
+  z-index: 1040;
+  transition: transform 0.3s ease-in-out;
+}
+
+.user-panel.hidden {
+  transform: translateX(100%);
+}
+
+.user-panel-header {
+  text-align: center;
+}
+
+.user-panel-pic {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.user-panel-body {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profile-form-container {
+  position: relative;
+}
+
+.close-x {
+  font-size: 1.8rem;
+  color: red;
+  text-decoration: none;
+  font-weight: bold;
+  transition: transform 0.2s ease;
+}
+
+.close-x:hover {
+  transform: scale(1.2);
+  color: darkred;
+}

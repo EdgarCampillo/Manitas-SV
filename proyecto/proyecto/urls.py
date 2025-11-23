@@ -4,6 +4,9 @@ from manitas import views
 
 from django.contrib.auth import views as auth_views
 from django.urls import path, include
+from manitas.views import perfil_view
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -13,6 +16,7 @@ urlpatterns = [
     path('lecciones/', views.lecciones, name="lecciones"),
     path('registrate/', views.registrate, name="registrate"),
     path('login/', views.login_view, name="login"),
+    path('perfil/', perfil_view, name='perfil'),
     path('logout/', views.logout_view, name="logout"),
 
 
@@ -26,4 +30,4 @@ urlpatterns = [
     path('oauth/', include('social_django.urls', namespace='social')),
     path('registrate_google/', views.registrate_google, name='registrate_google'),
 
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

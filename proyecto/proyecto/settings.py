@@ -163,3 +163,6 @@ SOCIAL_AUTH_PIPELINE = (
     
     'manitas.pipeline.require_extra_data',
 )
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

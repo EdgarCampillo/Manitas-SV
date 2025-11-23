@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from .models import Perfil
 
 class RegistroForm(UserCreationForm):
     nombre_completo = forms.CharField(
@@ -31,3 +32,40 @@ class RegistroForm(UserCreationForm):
         if commit:
             user.save()
         return user
+    
+class PerfilForm(forms.ModelForm):
+    
+    first_name = forms.CharField(label="Nombre", max_length=30, required=False)
+    last_name = forms.CharField(label="Apellido", max_length=30, required=False)
+    username = forms.CharField(label="Usuario", max_length=30)
+    email = forms.EmailField(label="Correo electrónico", required=False)
+
+    class Meta:
+        model = Perfil
+        fields = ['image']
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('instance', None)
+        perfil = None
+        if user and hasattr(user, 'perfil'):
+            perfil = user.perfil
+        super().__init__(*args, **kwargs)
+        if user:
+            self.fields['first_name'].initial = user.first_name
+            self.fields['last_name'].initial = user.last_name
+            self.fields['username'].initial = user.username
+            self.fields['email'].initial = user.email
+        if perfil:
+            self.instance = perfil
+
+    def save(self, commit=True):
+        Perfil = super().save(commit=False)
+        user = Perfil.user
+        user.first_name = self.cleaned_data['first_name']   
+        user.last_name = self.cleaned_data['last_name']
+        user.username = self.cleaned_data['username']
+        user.email = self.cleaned_data['email']
+        if commit:
+            user.save()
+            Perfil.save()
+        return Perfil
