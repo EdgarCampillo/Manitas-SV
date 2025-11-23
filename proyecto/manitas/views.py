@@ -3,6 +3,8 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
 from .forms import RegistroForm
 from django.contrib import messages
+from social_django.models import UserSocialAuth
+
 
 
 # Create your views here.
@@ -33,6 +35,29 @@ def registrate(request):
     else:
         form = RegistroForm()
     return render(request, 'registrate.html', {'form': form})
+
+def registrate_google(request):
+    email = request.session.get('pending_email')
+    nombre = request.session.get('pending_nombre')
+    if not email:
+        return redirect('registrate')
+
+    if request.method == 'POST':
+        form = RegistroForm(request.POST)
+        if form.is_valid():
+            usuario = form.save(commit=False)
+            usuario.email = email 
+            partes = form.cleaned_data['nombre_completo'].split(' ', 1)
+            usuario.first_name = partes[0]
+            usuario.last_name = partes[1] if len(partes) > 1 else ''
+            usuario.save()
+            login(request, usuario, backend='django.contrib.auth.backends.ModelBackend')
+            messages.success(request, "Cuenta creada con Google. ¡Bienvenido a Manitas SV!")
+            return redirect('home')
+    else:
+        form = RegistroForm(initial={'email': email, 'nombre_completo': nombre})
+
+    return render(request, 'registrate_google.html', {'form': form})
 
 def login_view(request):
     if request.method == 'POST':
