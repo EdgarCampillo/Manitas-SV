@@ -4,64 +4,70 @@
 
 {% block content %}
 
-<!--  REGISTRO DE USUARIO-->
+<!-- REGISTRO CON GOOGLE -->
 <section class="py-5">
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-md-6">
 
         <div class="text-center mb-4">
-          <h2 class="fw-bold">Crear una cuenta</h2>
-          <p class="text-muted">Unite a Manitas SV y comenzá tu aprendizaje en LESSA 🤟</p>
+          <h2 class="fw-bold">Completar registro</h2>
+          <p class="text-muted">
+            Usaste tu cuenta de Google para registrarte.  
+            Ahora completá los datos faltantes para tu perfil en Manitas SV 🤟
+          </p>
         </div>
 
         <form method="POST">
           {% csrf_token %}
           {{ form.non_field_errors }}
 
+          <!-- Nombre completo -->
           <div class="mb-3">
             <label for="id_nombre_completo" class="form-label fw-bold">Nombre completo</label>
             {{ form.nombre_completo|add_class:"form-control" }}
             {{ form.nombre_completo.errors }}
           </div>
 
+          <!-- Nombre de usuario -->
           <div class="mb-3">
             <label for="id_username" class="form-label fw-bold">Nombre de usuario</label>
             {{ form.username|add_class:"form-control" }}
             {{ form.username.errors }}
           </div>
 
+          <!-- Correo electrónico -->
           <div class="mb-3">
             <label for="id_email" class="form-label fw-bold">Correo electrónico</label>
-            {{ form.email|add_class:"form-control" }}
+            {{ form.email|add_class:"form-control"|attr:"readonly" }}
             {{ form.email.errors }}
           </div>
 
+          <!-- Contraseña -->
           <div class="mb-3">
             <label for="id_password1" class="form-label fw-bold">Contraseña</label>
             {{ form.password1|add_class:"form-control" }}
             {{ form.password1.errors }}
           </div>
 
+          <!-- Confirmar contraseña -->
           <div class="mb-3">
             <label for="id_password2" class="form-label fw-bold">Confirmar contraseña</label>
             {{ form.password2|add_class:"form-control" }}
             {{ form.password2.errors }}
           </div>
 
+          <!-- Botón -->
           <div class="d-grid">
-            <button type="submit" class="btn btn-morado btn-lg fw-bold">Registrarse</button>
+            <button type="submit" class="btn btn-morado btn-lg fw-bold">
+              Finalizar registro
+            </button>
           </div>
-
-          <div class="d-grid mt-3">
-            <a href="{% url 'social:begin' 'google-oauth2' %}" class="btn btn-danger btn-lg fw-bold">
-              <i class="bi bi-google"></i> Continuar con Google
-            </a>
-          </div>
-
 
           <div class="text-center mt-3">
-            <p class="small">¿Ya tenés cuenta? <a href="{% url 'login' %}" class="text-decoration-none fw-bold text-primary">Ingresá aquí</a></p>
+            <p class="small">
+              ¿Ya tenés cuenta? <a href="{% url 'login' %}" class="text-decoration-none fw-bold text-primary">Ingresá aquí</a>
+            </p>
           </div>
         </form>
 

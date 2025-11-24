@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+  .profile-form-container {
+    max-width: 600px;
+    margin: 40px auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    position: relative; /* necesario para posicionar la X */
+  }
+
+  .close-x {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 3rem;
+    height: 3rem;
+    background-color: transparent;
+    filter: invert(25%) sepia(100%) saturate(800%) hue-rotate(-10deg);
+    opacity: 1;
+    z-index: 10;
+    transition: transform 0.2s ease;
+  }
+
+  .close-x:hover {
+    transform: scale(1.2);
+    filter: invert(25%) sepia(100%) saturate(1000%) hue-rotate(-10deg);
+  }
+
+  .profile-image-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+    border: 2px solid #ccc;
+  }
+
+  .form-label {
+    font-weight: 500;
+  }
+</style>
+
+<div class="container profile-form-container">
+  <!-- Botón de cerrar -->
+<div class="d-flex justify-content-end">
+  <a href="{% url 'home' %}" class="close-x" aria-label="Cancelar edición" title="Cancelar edición">✖</a>
+</div>
+
+    <h3 class="mb-4 text-center">Editar perfil</h3>
+
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- Vista previa de la imagen -->
+    <div class="text-center">
+      {% if perfil.image %}
+        <img id="preview-image" src="{{ perfil.image.url }}" alt="Foto actual" class="profile-image-preview">
+      {% else %}
+        <img id="preview-image" src="{% static 'img/perfil.png' %}" alt="Foto por defecto" class="profile-image-preview">
+      {% endif %}
+    </div>
+
+    <!-- Campo para subir nueva imagen -->
+    <div class="mb-3">
+      <label for="id_image" class="form-label">Cambiar foto de perfil</label>
+      {{ form.image }}
+    </div>
+
+    <!-- Campos de usuario -->
+    <div class="mb-3">
+      <label for="id_first_name" class="form-label">Nombre</label>
+      {{ form.first_name }}
+    </div>
+
+    <div class="mb-3">
+      <label for="id_last_name" class="form-label">Apellido</label>
+      {{ form.last_name }}
+    </div>
+
+    <div class="mb-3">
+      <label for="id_username" class="form-label">Usuario</label>
+      {{ form.username }}
+    </div>
+
+    <div class="mb-3">
+      <label for="id_email" class="form-label">Correo electrónico</label>
+      {{ form.email }}
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">Guardar cambios</button>
+  </form>
+</div>
+
+<!-- Script para vista previa instantánea -->
+<script>
+  const input = document.getElementById('id_image');
+  const preview = document.getElementById('preview-image');
+
+  if (input) {
+    input.addEventListener('change', function() {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          preview.src = e.target.result;
+        }
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+</script>
+{% endblock %}
