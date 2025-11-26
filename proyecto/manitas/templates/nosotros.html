@@ -15,28 +15,68 @@
     --amarillo-suave: #FFCC00;
   }
 
+  /* HERO */
   .hero-nosotros{
     background: linear-gradient(135deg, var(--azul-oscuro) 0%, var(--morado) 100%);
     color: white;
-    padding: 4rem 0;
+    padding: 5rem 0;
+    position: relative;
+  }
+  .hero-nosotros h1{
+    font-size: 3rem;
+    letter-spacing: 1px;
+  }
+  .hero-nosotros::after{
+    content:"";
+    position:absolute;
+    bottom:0;
+    left:0;
+    width:100%;
+    height:8px;
+    background: var(--amarillo);
   }
 
+  /* SECCION TITULOS */
+  .section-title{
+    display:flex;
+    align-items:center;
+    gap:.6rem;
+    font-weight:700;
+  }
+  .section-title i{
+    color: var(--violeta);
+  }
+
+  /* CARDS */
   .card-valores, .card-beneficio{
     border: none;
-    border-radius: 12px;
-    padding: 1.25rem;
+    border-radius: 16px;
+    padding: 1.5rem;
     background: white;
     box-shadow: 0 6px 18px rgba(9,0,64,0.08);
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+  .card-valores:hover, .card-beneficio:hover{
+    transform: translateY(-6px);
+    box-shadow: 0 10px 24px rgba(9,0,64,0.12);
   }
 
-  .team-photo{
-    width: 120px;
-    height: 120px;
-    object-fit: cover;
-    border-radius: 12px;
-    border: 4px solid var(--celeste);
+  /* ICONOS */
+  .icon-circle{
+    width:64px;
+    height:64px;
+    border-radius:50%;
+    background: var(--celeste);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0 auto 1rem;
+    font-size:1.6rem;
+    color: var(--azul-oscuro);
+    box-shadow: 0 4px 10px #303481(9,0,64,0.08);
   }
 
+  /* ACCENTS */
   .accent-pill{
     display:inline-block;
     padding: .25rem .6rem;
@@ -44,71 +84,115 @@
     background: var(--amarillo);
     color: var(--azul-muy-oscuro);
     font-weight:700;
+    font-size:.85rem;
   }
 
-  .my-custom-title {
-    color: #FFF200; /* Amarillo de tu paleta */
-}
+  /* EQUIPO */
+  .team-photo{
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid var(--celeste);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .badge-role{
+    background: var(--gris-claro);
+    color: var(--azul-muy-oscuro);
+    border-radius:999px;
+    padding:.25rem .6rem;
+    font-size:.8rem;
+    display:inline-block;
+  }
 
+  /* CTA */
+  .cta-final{
+    background: linear-gradient(90deg, var(--celeste), var(--gris-claro));
+    border-top: 6px solid var(--amarillo);
+  }
 
+  /* ENLACES */
+  .link-clean{
+    color: var(--azul-oscuro);
+    text-decoration: none;
+  }
+  .link-clean:hover{
+    color: var(--morado);
+    text-decoration: underline;
+  }
 </style>
 
-<section class="hero-nosotros text-center">
+<!-- HERO MEJORADO -->
+<section class="hero-nosotros text-center" style="background: linear-gradient(135deg, #303481 0%, #D6E6F2 100%); color: white; padding: 5rem 0; font-family: 'Poppins', sans-serif;">
   <div class="container">
-
-    <h1 class="fw-bold my-custom-title">Sobre Manitas SV</h1>
-    <p class="lead mt-3">Una plataforma inclusiva e innovadora para aprender el Lenguaje de Señas Salvadoreño (LESSA). Enseñamos con corazón, tecnología y un enfoque práctico.</p>
-    <div class="mt-4">
-      <a href="{% url 'home' %}" class="btn btn-light btn-lg fw-bold me-2">Volver al inicio</a>
-      <a href="" class="btn btn-outline-light btn-lg fw-bold">Contáctanos</a>
+    <div class="row align-items-center g-4">
+      <div class="col-md-6 text-md-start text-center">
+        <h1 class="fw-bold" style="font-size: 3rem; color: #FFF200;">Sobre Manitas SV</h1>
+        <p class="lead mt-3" style="color: #ffffff;">Una plataforma inclusiva e innovadora para aprender el Lenguaje de Señas Salvadoreño (LESSA). Enseñamos con corazón, tecnología y un enfoque práctico.</p>
+        <div class="mt-4">
+          <a href="{% url 'home' %}" class="btn btn-warning btn-lg fw-bold me-2"><i class="bi bi-house-door-fill"></i> Inicio</a>
+          <a href="{% url 'contacto' %}" class="btn btn-outline-light btn-lg fw-bold"><i class="bi bi-envelope-fill"></i> Contáctanos</a>
+        </div>
+      </div>
+      <div class="col-md-6 text-center">
+        <!-- Espacio para imagen decorativa -->
+        <img src="{% static 'img/ilustracion de senas.png' %}" alt="Ilustración de inclusión y lenguaje de señas" class="img-fluid" style="max-height:300px;">
+      </div>
     </div>
   </div>
 </section>
 
-<!-- HISTORIA -->
-<section class="py-5 bg-light">
-  <div class="container">
-    <div class="row align-items-center">
-      <div class="col-md-6">
-        <h2 class="fw-bold">Nuestra historia</h2>
-        <p class="mt-3">Manitas SV nació en 2025 cuando cuatro amigos —educadores, desarrolladores y familiares de personas con discapacidad auditiva— se juntaron para resolver un problema claro: la falta de recursos accesibles y culturales para aprender LESSA en El Salvador.
-        </p>
-        <p>Lo que empezó como una serie de videos caseros se convirtió en un proyecto con lecciones estructuradas, ejercicios prácticos y herramientas para docentes y familias. Hoy somos una comunidad comprometida con la inclusión y la comunicación efectiva.</p>
-      </div>
 
+<!-- HISTORIA -->
+<section class="py-5 bg-light" aria-labelledby="historia-title">
+  <div class="container">
+    <div class="row align-items-center g-4">
+      <div class="col-md-6">
+        <h2 id="historia-title" class="section-title"><i class="bi bi-book"></i> Nuestra historia</h2>
+        <p class="mt-3">Manitas SV nació en 2025 cuando cuatro amigos —educadores, desarrolladores y familiares de personas con discapacidad auditiva— se juntaron para resolver un problema claro: la falta de recursos accesibles y culturales para aprender LESSA en El Salvador.</p>
+        <p>Lo que empezó como una serie de videos caseros se convirtió en un proyecto con lecciones estructuradas, ejercicios prácticos y herramientas para docentes y familias. Hoy somos una comunidad comprometida con la inclusión y la comunicación efectiva.</p>
+        <div class="d-flex gap-2 mt-3">
+          <span class="accent-pill">LESSA</span>
+          <span class="accent-pill">Accesibilidad</span>
+          <span class="accent-pill">Inclusión</span>
+        </div>
+      </div>
       <div class="col-md-6 text-center">
-        <img src="{% static 'img/Icono sin fondo.png' %}" alt="Historia Manitas SV" class="img-fluid rounded shadow" style="max-height:320px; object-fit:cover;">
+        <!-- Espacio para imagen historia -->
+        <img src="{% static 'img/persona aprendiendo lessa.jpg' %}" alt="Personas aprendiendo LESSA en comunidad" class="img-fluid rounded shadow" style="max-height:340px; object-fit:cover;">
       </div>
     </div>
   </div>
 </section>
 
 <!-- MISION VISION VALORES -->
-<section class="py-5">
+<section class="py-5" aria-labelledby="mvv-title">
   <div class="container">
-    <div class="row">
+    <h2 id="mvv-title" class="section-title justify-content-center mb-4"><i class="bi bi-compass"></i> Misión, visión y valores</h2>
+    <div class="row text-center">
       <div class="col-md-4 mb-4">
         <div class="card card-valores h-100 p-4">
+          <div class="icon-circle" aria-hidden="true"><i class="bi bi-bullseye"></i></div>
           <h3 class="fw-bold">Misión</h3>
-          <p class="mb-0">Empoderar a personas con discapacidad auditiva, sus familias y la comunidad salvadoreña mediante una plataforma educativa accesible, práctica y culturalmente relevante que facilite el aprendizaje del LESSA y promueva la inclusión real.</p>
+          <p>Empoderar a personas con discapacidad auditiva, sus familias y la comunidad salvadoreña mediante una plataforma educativa accesible, práctica y culturalmente relevante.</p>
         </div>
       </div>
-
       <div class="col-md-4 mb-4">
         <div class="card card-valores h-100 p-4">
+          <div class="icon-circle" aria-hidden="true"><i class="bi bi-eye"></i></div>
           <h3 class="fw-bold">Visión</h3>
-          <p class="mb-0">Ser la referencia nacional en educación en Lenguaje de Señas Salvadoreño, creando puentes de comunicación para un El Salvador más inclusivo, donde la barrera del lenguaje deje de ser un impedimento para la participación social y educativa.</p>
+          <p>Ser la referencia nacional en educación en Lenguaje de Señas Salvadoreño, creando puentes de comunicación para un El Salvador más inclusivo.</p>
         </div>
       </div>
-
       <div class="col-md-4 mb-4">
         <div class="card card-valores h-100 p-4">
+          <div class="icon-circle" aria-hidden="true"><i class="bi bi-heart"></i></div>
           <h3 class="fw-bold">Valores</h3>
-          <ul class="list-unstyled mb-0">
-            <li class="mb-2"><strong>Inclusión:</strong> Creemos que todas las personas merecen acceso a la comunicación.</li>
-            <li class="mb-2"><strong>Respeto:</strong> Valoramos la cultura y identidad de la comunidad sorda.</li>
-            <li class="mb-2"><strong>Innovación:</strong> Usamos tecnología y pedagogía práctica para aprender haciendo.</li>
-            <li class="mb-2"><strong>Colaboración:</strong> Trabajamos con familias, docentes y organizaciones para mejorar continuamente.</li>
+          <ul class="list-unstyled mb-0 text-start">
+            <li class="mb-2"><strong>Inclusión:</strong> Acceso para todas las personas.</li>
+            <li class="mb-2"><strong>Respeto:</strong> Cultura e identidad de la comunidad sorda.</li>
+            <li class="mb-2"><strong>Innovación:</strong> Tecnología y pedagogía práctica.</li>
+            <li class="mb-2"><strong>Colaboración:</strong> Familias, docentes y organizaciones.</li>
           </ul>
         </div>
       </div>
@@ -117,95 +201,89 @@
 </section>
 
 <!-- BENEFICIOS -->
-<section class="py-5 bg-light">
+<section class="py-5 bg-light" aria-labelledby="beneficios-title">
   <div class="container">
-    <h2 class="fw-bold text-center mb-4">Beneficios de usar Manitas SV</h2>
+    <h2 id="beneficios-title" class="section-title justify-content-center mb-4"><i class="bi bi-stars"></i> Beneficios de usar Manitas SV</h2>
     <div class="row g-4 justify-content-center">
-
       <div class="col-md-3">
-        <div class="card-beneficio p-3 text-center h-100">
-          <div class="mb-2 accent-pill">1</div>
+        <div class="card-beneficio text-center h-100 p-3">
+          <div class="icon-circle" aria-hidden="true"><i class="bi bi-journal-check"></i></div>
           <h5 class="fw-bold">Lecciones prácticas</h5>
           <p class="small mb-0">Estructuradas por niveles con ejercicios y retroalimentación.</p>
         </div>
       </div>
-
       <div class="col-md-3">
-        <div class="card-beneficio p-3 text-center h-100">
-          <div class="mb-2 accent-pill">2</div>
+        <div class="card-beneficio text-center h-100 p-3">
+          <div class="icon-circle" aria-hidden="true"><i class="bi bi-phone"></i></div>
           <h5 class="fw-bold">Accesibilidad</h5>
-          <p class="small mb-0">Diseñado para dispositivos móviles y escritorio, con recursos visuales claros.</p>
+          <p class="small mb-0">Diseñado para móviles y escritorio, con recursos visuales claros.</p>
         </div>
       </div>
-
       <div class="col-md-3">
-        <div class="card-beneficio p-3 text-center h-100">
-          <div class="mb-2 accent-pill">3</div>
+        <div class="card-beneficio text-center h-100 p-3">
+          <div class="icon-circle" aria-hidden="true"><i class="bi bi-people"></i></div>
           <h5 class="fw-bold">Culturalmente relevante</h5>
           <p class="small mb-0">Contenidos adaptados al contexto salvadoreño y ejemplos cotidianos.</p>
         </div>
       </div>
-
       <div class="col-md-3">
-        <div class="card-beneficio p-3 text-center h-100">
-          <div class="mb-2 accent-pill">4</div>
+        <div class="card-beneficio text-center h-100 p-3">
+          <div class="icon-circle" aria-hidden="true"><i class="bi bi-person-workspace"></i></div>
           <h5 class="fw-bold">Soporte para docentes</h5>
           <p class="small mb-0">Materiales y guías para facilitar la enseñanza en escuelas y talleres.</p>
         </div>
       </div>
-
     </div>
   </div>
 </section>
 
-<!-- EQUIPO / DESARROLLADORES -->
-<section class="py-5">
+<!-- EQUIPO -->
+<section class="py-5" aria-labelledby="equipo-title">
   <div class="container">
-    <h2 class="fw-bold text-center mb-4">El equipo detrás de Manitas SV</h2>
+    <h2 id="equipo-title" class="section-title justify-content-center mb-4"><i class="bi bi-people-fill"></i> El equipo detrás de Manitas SV</h2>
     <p class="text-center text-muted">Somos un equipo pequeño, apasionado y multidisciplinario.</p>
 
     <div class="row g-4 justify-content-center mt-4">
 
-      <!-- bloque para cada desarrollador (4) -->
       <div class="col-md-3 text-center">
-        <img src="{% static 'img/team/placeholder1.jpg' %}" alt="Foto desarrollador 1" class="team-photo mb-3">
+        <img src="{% static 'img/team/placeholder1.jpg' %}" alt="Retrato de Madeline Mejía" class="team-photo mb-3">
         <h5 class="fw-bold mb-1">Madeline Mejía</h5>
-        <p class="mb-1 text-muted small">Backend / Python</p>
+        <span class="badge-role mb-2">Backend / Python</span>
         <p class="small">Responsable de la arquitectura y desarrollo en Django.</p>
       </div>
 
       <div class="col-md-3 text-center">
-        <img src="{% static 'img/Foto-Freddy.jpeg' %}" alt="Foto desarrollador 2" class="team-photo mb-3">
+        <img src="{% static 'img/Foto-Freddy.jpeg' %}" alt="Retrato de Freddy Vásquez" class="team-photo mb-3">
         <h5 class="fw-bold mb-1">Freddy Vásquez</h5>
-        <p class="mb-1 text-muted small">Contenido pedagógico</p>
+        <span class="badge-role mb-2">Contenido pedagógico</span>
         <p class="small">Experto en didáctica y creación de lecciones.</p>
       </div>
 
       <div class="col-md-3 text-center">
-        <img src="{% static 'img/Foto-Edgar.jpeg' %}" alt="Foto desarrollador 3" class="team-photo mb-3">
+        <img src="{% static 'img/Foto-Edgar.jpeg' %}" alt="Retrato de Edgar Campillo" class="team-photo mb-3">
         <h5 class="fw-bold mb-1">Edgar Campillo</h5>
-        <p class="mb-1 text-muted small">Frontend / UX</p>
-        <p class="small">Apasionado por el diseño accesible y la experiencia de usuario.</p>
+        <span class="badge-role mb-2">Frontend / UX</span>
+        <p class="small">Diseño accesible y experiencia de usuario.</p>
       </div>
 
       <div class="col-md-3 text-center">
-        <img src="{% static 'img/team/placeholder4.jpg' %}" alt="Foto desarrollador 4" class="team-photo mb-3">
+        <img src="{% static 'img/Foto_Francisca.jpeg' %}" alt="Retrato de Francisca Bonilla" class="team-photo mb-3">
         <h5 class="fw-bold mb-1">Francisca Bonilla</h5>
-        <p class="mb-1 text-muted small">Community / QA</p>
-        <p class="small">Encargado de la comunidad y pruebas de usabilidad.</p>
+        <span class="badge-role mb-2">Community / QA</span>
+        <p class="small">Gestión de comunidad y pruebas de usabilidad.</p>
       </div>
 
     </div>
-
   </div>
 </section>
 
 <!-- CTA FINAL -->
-<section class="text-center py-5" style="background: linear-gradient(90deg, var(--celeste), var(--gris-claro));">
+<section class="text-center py-5 cta-final" aria-labelledby="cta-title">
   <div class="container">
-    <h3 class="fw-bold">¿Querés sumarte y ayudar a construir un El Salvador más inclusivo?</h3>
+    <h3 id="cta-title" class="fw-bold">¿Querés sumarte y ayudar a construir un El Salvador más inclusivo?</h3>
     <p class="mb-3">Si sos docente, familiar o desarrollador y querés colaborar, escribinos — estamos construyendo esto juntos.</p>
-    <a href="" class="btn btn-primary btn-lg">Contactar al equipo</a>
+    <a href="{% url 'contacto' %}" class="btn btn-primary btn-lg"><i class="bi bi-send"></i> Contactar al equipo</a>
+
   </div>
 </section>
 

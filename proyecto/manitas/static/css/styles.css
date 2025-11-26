@@ -201,6 +201,21 @@ body, html {
 }
 
 /* HERO PRINCIPAL */
+.hero-manitas h1 {
+  color: white;
+}
+
+.hero-manitas h1 {
+  color: white;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.banner-container img {
+  max-width: 1400px;
+  width: 100%;
+  height: auto;
+}
+
 .hero-manitas {
     background: linear-gradient(
         rgba(9, 0, 64, 0.7), 

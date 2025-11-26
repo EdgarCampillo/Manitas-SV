@@ -30,19 +30,16 @@
   </div>
 {% endif %}
 
-<<<<<<< HEAD
 <!-- ============================
               HERO / BANNER
 ================================= -->
-=======
-<!--  BANNER -->
->>>>>>> 61286a8327a334616ed4a7a8ee0cf64c9474e5e9
-<section class="hero-manitas text-white py-5">
-  <div class="container text-center">
+<section class="hero-manitas text-white py-5" style="width: 100%;">
+  <div class="container-fluid text-center d-flex flex-column align-items-center">
 
-    <h1 class="fw-bold mb-3">
+    <h1 class="fw-bold mb-3" style="color: white;">
       Aprendé LESSA de forma fácil, interactiva y ¡a tu ritmo!
     </h1>
+
 
     <p class="lead mb-4">
       Tu plataforma inclusiva para aprender el Lenguaje de Señas Salvadoreño —
@@ -56,12 +53,12 @@
       <a href="{% url 'registrate' %}" class="btn btn-morado btn-lg fw-bold px-4">Crear Cuenta</a>
     </div>
 
-    <!-- IMAGEN BANNER -->
-    <div class="mt-5">
-      <div class="banner-container">
-        <img src="{% static 'img/Banner inicio.jpg' %}" alt="banner motivacional" class="banner-img">
-      </div>
+   <div class="mt-5 w-100 d-flex justify-content-center">
+    <div class="banner-container text-center" style="max-width: 1400px;">
+      <img src="{% static 'img/Banner inicial.png' %}" alt="banner inferior"
+          class="img-fluid" style="width: 100%; height: auto;">
     </div>
+  </div>
 
   </div>
 </section>

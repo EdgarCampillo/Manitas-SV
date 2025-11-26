@@ -18,6 +18,7 @@ def diccionario_visual(request):
     letras = [chr(i) for i in range(65, 91)]  # A-Z
     return render(request, 'diccionario_visual.html', {'letras': letras})
 
+
 def lecciones(request):
     return render(request, 'lecciones.html')
 
@@ -26,6 +27,9 @@ def nosotros(request):
 
 def contacto(request):
     return render(request, 'contacto.html')
+
+def leccion1(request):
+    return render(request, 'leccion1.html')
 
 def registrate(request):
     if request.method == 'POST':

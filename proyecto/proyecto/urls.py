@@ -20,6 +20,9 @@ urlpatterns = [
     path('logout/', views.logout_view, name="logout"),
     path('nosotros/', views.nosotros, name='nosotros'),
     path('contacto/', views.contacto, name='contacto'),
+    
+    path('leccion1/', views.leccion1, name='leccion1'),
+
 
 
     path('recuperar_password/', auth_views.PasswordResetView.as_view(template_name='recuperar_password.html' ),name='password_reset'),

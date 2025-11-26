@@ -12,6 +12,9 @@ db.sqlite3
 *.pyc
 __pycache__/
 
+
+
+
 # Archivos estáticos generados
 staticfiles/
 
@@ -21,3 +24,10 @@ Thumbs.db
 
 # Configuración de VSCode
 .vscode/
+
+__pycache__/
+*.pyc
+db.sqlite3
+.env
+entorno/
+venv/

@@ -16,10 +16,10 @@
                 <div class="card h-100 shadow-sm border-0">
                     <div class="card-body">
                         <h5 class="fw-bold">{{ letra }}</h5>
-                        <img src="{% static 'img/abecedario/'|add:letra|add:'.png' %}" alt="Seña {{ letra }}" class="img-fluid rounded mb-2">
-                        <button class="btn btn-morado-outline btn-sm fw-bold w-100 mt-2">
-                            Ver animación
-                        </button>
+                        {% with ruta='img/letras/'|add:letra|lower|add:'.png' %}
+                            <img src="{% static ruta %}" alt="Seña {{ letra }}" class="img-fluid rounded mb-2" 
+                            data-default-src="{% static 'img/letras/no_disponible.jpeg' %}" onerror="this.onerror=null;this.src=this.dataset.defaultSrc;">
+                        {% endwith %}
                     </div>
                 </div>
             </div>
@@ -28,10 +28,11 @@
     </div>
 </section>
 
-<section class="bg-primary text-white text-center py-5 mt-5">
-    <h2 class="fw-bold mb-3">¿Listo para aprender más?</h2>
-    <p class="lead mb-4">Explorá nuestras lecciones interactivas y seguí practicando tus señas.</p>
-    <a href="{% url 'lecciones' %}" class="btn btn-light btn-lg fw-bold">Ir a Lecciones</a>
+<section style="background-color: #6DA7D2;" class="text-white text-center py-5 mt-5">
+  <h2 class="fw-bold mb-3">¿Listo para aprender más?</h2>
+  <p class="lead mb-4">Explorá nuestras lecciones interactivas y seguí practicando tus señas.</p>
+  <a href="{% url 'lecciones' %}" class="btn btn-light btn-lg fw-bold">Ir a Lecciones</a>
 </section>
+
 
 {% endblock %}

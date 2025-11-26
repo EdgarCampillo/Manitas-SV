@@ -3,30 +3,111 @@
 
 {% block content %}
 
-<!-- HERO CONTACTO -->
-<section class="py-5 text-center" style="background-color:#f7f7f9; color:rgb(8, 7, 7);">
-  <div class="container">
-    <h1 class="fw-bold mb-3">Contáctanos</h1>
-    <p class="lead mb-4">Tu voz es importante. Escríbenos y juntos construiremos un futuro más inclusivo.</p>
+<style>
+  :root {
+    --azul-oscuro: #303481;
+    --celeste: #D6E6F2;
+    --gris-claro: #F5F5F5;
+    --amarillo: #FFF200;
+    --morado: #471396;
+    --violeta: #B13BFF;
+    --amarillo-suave: #FFCC00;
+  }
 
-    <!-- Logo/Mascota -->
-    <div class="my-3">
-      <img src="{% static 'img/Mascota_icono.png' %}" alt="Mascota o Logo" 
-           style="max-width:120px; filter:drop-shadow(0 0 6px #FFF200);">
-    </div>
+  .hero-contacto {
+    background: linear-gradient(135deg, var(--azul-oscuro), var(--celeste));
+    color: white;
+    padding: 5rem 0;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .card-contacto {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease;
+  }
+
+  .card-contacto:hover {
+    transform: translateY(-4px);
+  }
+
+  .icon-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--celeste);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.4rem;
+    color: var(--azul-oscuro);
+  }
+
+  .btn-enviar {
+    background-color: var(--morado);
+    color: white;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn-enviar:hover {
+    background-color: var(--violeta);
+  }
+
+  .social-icon {
+    font-size: 1.8rem;
+    transition: transform 0.3s ease;
+  }
+
+  .social-icon:hover {
+    transform: scale(1.2);
+  }
+</style>
+
+<!-- HERO CONTACTO SIN FONDO -->
+<section class="text-center position-relative" style="padding: 6rem 0; font-family: 'Poppins', sans-serif;">
+  <div class="container position-relative" style="z-index: 2;">
+    <h1 class="fw-bold mb-3" style="font-size: 3rem; color: #303481;">Contáctanos</h1>
+    <p class="lead mb-4" style="max-width: 600px; margin: 0 auto; color: #090040;">
+      Tu voz es importante. Escríbenos y juntos construiremos un futuro más inclusivo.
+    </p>
   </div>
+
+  <!-- Imagen decorativa en esquina inferior derecha -->
+  <img src="{% static 'img/Mascota_icono.png' %}" alt="Mascota Manitas SV"
+       class="position-absolute bottom-0 end-0 img-fluid d-none d-md-block"
+       style="max-width: 320px; z-index: 1; transform: translate(20%, 10%);">
+
+  <!-- Imagen decorativa en esquina superior izquierda -->
+  <img src="{% static 'img/icono de contacto.png' %}" alt="Decoración superior izquierda"
+       class="position-absolute top-0 start-0 img-fluid d-none d-md-block"
+       style="max-width: 360px; z-index: 1; transform: translate(-25%, -15%);">
 </section>
 
-<!-- SECCIÓN PRINCIPAL -->
-<section class="py-5" style="background-color:#F5F5F5;">
+
+<!-- Animación suave -->
+<style>
+@keyframes flotar {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
+</style>
+
+
+
+<!-- FORMULARIO + INFO -->
+<section class="py-5" style="background-color: var(--gris-claro);">
   <div class="container">
-    <div class="row g-4">
+    <div class="row g-4 align-items-stretch">
 
       <!-- FORMULARIO -->
       <div class="col-lg-6">
-        <div class="card border-0 shadow-lg h-100">
+        <div class="card card-contacto h-100">
           <div class="card-body p-4">
-            <h3 class="fw-bold mb-4" style="color:#090040;">Envíanos un mensaje</h3>
+            <h3 class="fw-bold mb-4" style="color: var(--azul-oscuro);">Envíanos un mensaje</h3>
             <form method="post">
               {% csrf_token %}
               <div class="mb-3">
@@ -41,46 +122,52 @@
                 <label class="form-label fw-semibold">Mensaje</label>
                 <textarea class="form-control" name="mensaje" rows="4" placeholder="¿En qué podemos ayudarte?"></textarea>
               </div>
-              <button class="btn w-100 fw-bold" 
-                      style="background-color:#471396; color:white; border-radius:8px;">
-                Enviar mensaje
-              </button>
+              <button class="btn btn-enviar w-100 fw-bold">Enviar mensaje</button>
             </form>
           </div>
         </div>
       </div>
 
       <!-- INFORMACIÓN DE CONTACTO -->
-      <div class="col-lg-6">
-        <div class="card border-0 shadow-lg h-100">
-          <div class="card-body p-4">
-            <h3 class="fw-bold mb-4" style="color:#090040;">Información de contacto</h3>
-            <div class="mb-3 d-flex align-items-center">
-              <i class="bi bi-envelope-fill fs-4 me-3" style="color:#471396;"></i>
-              <span>contacto@manitassv.org</span>
-            </div>
-            <div class="mb-3 d-flex align-items-center">
-              <i class="bi bi-telephone-fill fs-4 me-3" style="color:#471396;"></i>
-              <span>+503 7777-7777</span>
-            </div>
-            <div class="mb-4 d-flex align-items-center">
-              <i class="bi bi-geo-alt-fill fs-4 me-3" style="color:#471396;"></i>
-              <span>San Salvador, El Salvador</span>
+        <div class="col-lg-6 position-relative">
+          <div class="card card-contacto h-100 position-relative" style="overflow: hidden;">
+            <div class="card-body p-4 position-relative" style="z-index: 2;">
+              <h3 class="fw-bold mb-4" style="color: var(--azul-oscuro);">Información de contacto</h3>
+
+              <div class="mb-3 d-flex align-items-center">
+                <div class="icon-circle"><i class="bi bi-envelope-fill"></i></div>
+                <span>contacto@manitassv.org</span>
+              </div>
+              <div class="mb-3 d-flex align-items-center">
+                <div class="icon-circle"><i class="bi bi-telephone-fill"></i></div>
+                <span>+503 7777-7777</span>
+              </div>
+              <div class="mb-4 d-flex align-items-center">
+                <div class="icon-circle"><i class="bi bi-geo-alt-fill"></i></div>
+                <span>San Miguel, El Salvador</span>
+              </div>
+
+              <h5 class="fw-bold mb-3">Síguenos en redes sociales</h5>
+              <div class="d-flex gap-3">
+                <a href="#" class="social-icon" style="color: #303481;"><i class="bi bi-facebook"></i></a>
+                <a href="#" class="social-icon" style="color: #B13BFF;"><i class="bi bi-instagram"></i></a>
+                <a href="#" class="social-icon" style="color: #FFCC00;"><i class="bi bi-tiktok"></i></a>
+                <a href="#" class="social-icon" style="color: #471396;"><i class="bi bi-youtube"></i></a>
+              </div>
             </div>
 
-            <h5 class="fw-bold mb-3">Síguenos en redes sociales</h5>
-            <div class="d-flex gap-3">
-              <a href="#" class="fs-3" style="color:#303481;"><i class="bi bi-facebook"></i></a>
-              <a href="#" class="fs-3" style="color:#B13BFF;"><i class="bi bi-instagram"></i></a>
-              <a href="#" class="fs-3" style="color:#FFCC00;"><i class="bi bi-tiktok"></i></a>
-              <a href="#" class="fs-3" style="color:#471396;"><i class="bi bi-youtube"></i></a>
-            </div>
+            <!-- Imagen decorativa en esquina inferior derecha -->
+            <img src="{% static 'img/concatctos.png' %}" alt="Ilustración contacto"
+                class="position-absolute end-0 bottom-0 img-fluid"
+                style="max-width: 320px; z-index: 1; object-fit: contain;">
           </div>
         </div>
-      </div>
+
+
 
     </div>
   </div>
 </section>
 
 {% endblock %}
+
