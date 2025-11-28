@@ -19,18 +19,32 @@ def diccionario_visual(request):
     return render(request, 'diccionario_visual.html', {'letras': letras})
 
 
-def lecciones(request):
-    return render(request, 'lecciones.html')
-
 def nosotros(request):
     return render(request, 'nosotros.html')
 
 def contacto(request):
     return render(request, 'contacto.html')
 
+#Lecciones
+def lecciones(request):
+    return render(request, 'lecciones.html')
+
 def leccion1(request):
     return render(request, 'leccion1.html')
 
+def leccion2(request):
+    return render(request, 'leccion2.html')
+
+def leccion3(request):
+    return render(request, 'leccion3.html')
+
+def leccion4(request):
+    return render(request, 'leccion4.html')
+
+def ejercicios(request):
+    return render(request, 'ejercicios.html')
+
+#registro, login, logout, perfil
 def registrate(request):
     if request.method == 'POST':
         form = RegistroForm(request.POST)

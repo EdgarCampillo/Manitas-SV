@@ -40,7 +40,7 @@
         </li>
 
         <li class="nav-item">
-          <a class="nav-link" href="">Ejercicios</a>
+          <a class="nav-link" href="{% url 'ejercicios' %}">Ejercicios</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{% url 'nosotros' %}">Nosotros</a>
@@ -71,7 +71,7 @@
 <!-- FOTO DE PERFIL EN ESQUINA -->
 {% if user.is_authenticated %}
 <div class="user-profile-trigger" onclick="toggleUserPanel()">
-  {% if user.perfil.image %}
+  {% if user.perfil.image and user.perfil.image.url %}
     <img src="{{ user.perfil.image.url }}" alt="Foto de perfil" class="user-profile-pic">
   {% else %}
     <img src="{% static 'img/perfil.png' %}" alt="Foto de perfil" class="user-profile-pic">

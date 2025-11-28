@@ -22,7 +22,11 @@ urlpatterns = [
     path('contacto/', views.contacto, name='contacto'),
     
     path('leccion1/', views.leccion1, name='leccion1'),
+    path('leccion2/', views.leccion2, name='leccion2'),
+    path('leccion3/', views.leccion3, name='leccion3'),
+    path('leccion4/', views.leccion4, name='leccion4'),
 
+    path('ejercicios/', views.ejercicios, name='ejercicios'),
 
 
     path('recuperar_password/', auth_views.PasswordResetView.as_view(template_name='recuperar_password.html' ),name='password_reset'),

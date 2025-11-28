@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="py-5" style="background-color: #F5F5F5;">
+  <div class="container">
+
+    <!-- Título principal -->
+    <div class="text-center mb-5">
+      <h1 class="fw-bold" style="color: #303481;">Ejercicios Interactivos en desarrollo.</h1>
+      <p class="lead" style="color: #471396;">
+        Practicá lo aprendido en las lecciones con nuestros ejercicios interactivos diseñados para reforzar tus habilidades en LESSA.
+      </p>
+    </div>
+
+    <!-- Contenido de los ejercicios -->
+    <div class="mb-5 p-4 rounded" style="background-color: #D6E6F2;">
+      <h3 class="fw-bold" style="color: #303481;">Practicá mientras con las actividades que se encuentran al final de las lecciones c: </h3>
+      <p>Seleccioná una lección para comenzar a practicar con ejercicios interactivos que te ayudarán a consolidar tus conocimientos.</p>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+            <p class="fw-bold">Lección 1: Saludos Básicos</p>
+          <a href="{% url 'leccion1' %}" class="btn btn-morado-outline fw-bold">Ejercicios de Lección 1: Saludos Básicos</a>
+        </li>
+        <li class="list-group-item">
+            <p class="fw-bold">Lección 2: Departamentos de El Salvador</p>
+          <a href="{% url 'leccion2' %}" class="btn btn-morado-outline fw-bold">Ejercicios de Lección 2: Departamentos de El Salvador</a>   
+        </li>
+        <li class="list-group-item">
+            <p class="fw-bold">Lección 3: El Abecedario</p>
+          <a href="{% url 'leccion3' %}" class="btn btn-morado-outline fw-bold">Ejercicios de Lección 3: El Abecedario</a>
+        </li>
+        <li class="list-group-item">
+            <p class="fw-bold">Lección 4: Números</p>
+          <a href="{% url 'leccion4' %}" class="btn btn-morado-outline fw-bold">Ejercicios de Lección 4: Números</a>
+      </ul>
+    </div>
+  </div>
+</section>
+
+ {% endblock %}
