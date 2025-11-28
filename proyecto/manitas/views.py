@@ -55,8 +55,8 @@ def registrate(request):
             usuario.first_name = partes[0]
             usuario.last_name = partes[1] if len(partes) > 1 else ''
             usuario.save()
-            login(request, usuario)
-            messages.success(request, "Cuenta creada con éxito. ¡Bienvenido a Manitas SV!")
+            login(request, usuario, backend='django.contrib.auth.backends.ModelBackend')
+            messages.success(request, "Cuenta creada con éxito.")
             return redirect('home')
     else:
         form = RegistroForm()
