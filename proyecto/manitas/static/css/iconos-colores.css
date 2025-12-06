@@ -1,0 +1,109 @@
+/* Colores vibrantes para iconos en todas las lecciones */
+
+/* Iconos de situaciones - Colores diferentes para cada una */
+.bi-people-fill,
+.bi-people { 
+  color: #FF6B6B !important; 
+  font-size: 1.2em;
+}
+
+.bi-house-door-fill,
+.bi-house-door { 
+  color: #4ECDC4 !important; 
+  font-size: 1.2em;
+}
+
+.bi-moon-fill,
+.bi-moon { 
+  color: #95E1D3 !important; 
+  font-size: 1.2em;
+}
+
+.bi-building,
+.bi-building-fill { 
+  color: #FF6B6B !important; 
+  font-size: 1.2em;
+}
+
+.bi-geo-alt,
+.bi-geo-alt-fill { 
+  color: #4ECDC4 !important; 
+  font-size: 1.2em;
+}
+
+.bi-type,
+.bi-type-h1 { 
+  color: #FF6B6B !important; 
+  font-size: 1.2em;
+}
+
+.bi-123 { 
+  color: #4ECDC4 !important; 
+  font-size: 1.2em;
+}
+
+/* Iconos de videos y contenido */
+.bi-play-circle-fill,
+.bi-play-circle { 
+  color: #FF6B6B !important; 
+  font-size: 1.2em;
+}
+
+.bi-book-fill,
+.bi-book { 
+  color: #4ECDC4 !important; 
+  font-size: 1.2em;
+}
+
+.bi-arrow-repeat { 
+  color: #95E1D3 !important; 
+  font-size: 1.2em;
+}
+
+/* Iconos de actividades */
+.bi-bullseye { 
+  color: #FF6B6B !important; 
+  font-size: 1.3em;
+}
+
+.bi-hand-index-fill,
+.bi-hand-index { 
+  color: #FF6B6B !important; 
+  font-size: 1.2em;
+}
+
+.bi-hand-thumbs-up-fill,
+.bi-hand-thumbs-up { 
+  color: #28a745 !important; 
+  font-size: 1.2em;
+}
+
+/* Iconos de sección familiares */
+.bi-heart-fill,
+.bi-heart { 
+  color: #FF6B6B !important; 
+  font-size: 1.2em;
+}
+
+.bi-camera-video-fill,
+.bi-camera-video { 
+  color: #FF6B6B !important; 
+  font-size: 1.2em;
+}
+
+.bi-lightbulb-fill,
+.bi-lightbulb { 
+  color: #FFD93D !important; 
+  font-size: 1.2em;
+}
+
+.bi-star-fill { 
+  color: #FFD93D !important; 
+  font-size: 1.2em;
+}
+
+.bi-check-circle-fill { 
+  color: #28a745 !important; 
+  font-size: 1.1em;
+}
+

@@ -5,28 +5,104 @@
 <!-- DICCIONARIO VISUAL -->
 <section class="py-5">
     <div class="container text-center">
-        <h1 class="fw-bold mb-4">Diccionario Visual</h1>
-        <p class="lead mb-5">
+        <h1 class="fw-bold mb-4 fade-in-up">Diccionario Visual</h1>
+        <p class="lead mb-5 fade-in-up">
             Explorá el abecedario en Lengua de Señas Salvadoreña. Cada letra tiene su seña representada visualmente.
         </p>
 
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 row-cols-lg-6 g-4">
+        <!-- Barra de búsqueda -->
+        <div class="row justify-content-center mb-4 fade-in-up">
+            <div class="col-md-6">
+                <div class="input-group input-group-lg">
+                    <span class="input-group-text" style="background-color: #471396; color: white;">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" 
+                           id="buscar-letra" 
+                           class="form-control" 
+                           placeholder="Buscar letra (ej: A, B, C...)"
+                           aria-label="Buscar letra">
+                </div>
+                <small class="text-muted mt-2 d-block">Escribí una letra para filtrar el diccionario</small>
+            </div>
+        </div>
+
+        <!-- Contador de resultados -->
+        <div class="mb-3 fade-in-up">
+            <p class="text-muted">
+                Mostrando <span id="contador-letras">{{ letras|length }}</span> letra(s)
+            </p>
+        </div>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 row-cols-lg-6 g-4" id="contenedor-letras">
             {% for letra in letras %}
-            <div class="col">
-                <div class="card h-100 shadow-sm border-0">
+            <div class="col letra-item" data-letra="{{ letra|lower }}">
+                <div class="card h-100 shadow-sm border-0 card-modern">
                     <div class="card-body">
                         <h5 class="fw-bold">{{ letra }}</h5>
                         {% with ruta='img/letras/'|add:letra|lower|add:'.png' %}
-                            <img src="{% static ruta %}" alt="Seña {{ letra }}" class="img-fluid rounded mb-2" 
-                            data-default-src="{% static 'img/letras/no_disponible.jpeg' %}" onerror="this.onerror=null;this.src=this.dataset.defaultSrc;">
+                            <img src="{% static ruta %}" 
+                                 alt="Seña {{ letra }}" 
+                                 class="img-fluid rounded mb-2 fixed-img" 
+                                 data-default-src="{% static 'img/letras/no_disponible.jpeg' %}" 
+                                 onerror="this.onerror=null;this.src=this.dataset.defaultSrc;"
+                                 loading="lazy">
                         {% endwith %}
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
+
+        <!-- Mensaje cuando no hay resultados -->
+        <div id="sin-resultados" class="alert alert-info mt-4" style="display: none;">
+            <i class="bi bi-info-circle"></i> No se encontraron letras que coincidan con tu búsqueda.
+        </div>
     </div>
 </section>
+
+<script>
+// Sistema de búsqueda para el diccionario
+document.addEventListener('DOMContentLoaded', function() {
+    const inputBuscar = document.getElementById('buscar-letra');
+    const contenedorLetras = document.getElementById('contenedor-letras');
+    const itemsLetras = document.querySelectorAll('.letra-item');
+    const contadorLetras = document.getElementById('contador-letras');
+    const sinResultados = document.getElementById('sin-resultados');
+
+    inputBuscar.addEventListener('input', function() {
+        const busqueda = this.value.trim().toLowerCase();
+        let visibleCount = 0;
+
+        itemsLetras.forEach(item => {
+            const letra = item.dataset.letra;
+            if (letra.includes(busqueda) || busqueda === '') {
+                item.style.display = '';
+                item.classList.add('fade-in-up');
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        contadorLetras.textContent = visibleCount;
+
+        // Mostrar mensaje si no hay resultados
+        if (visibleCount === 0 && busqueda !== '') {
+            sinResultados.style.display = 'block';
+        } else {
+            sinResultados.style.display = 'none';
+        }
+    });
+
+    // Efecto de entrada para las letras
+    itemsLetras.forEach((item, index) => {
+        setTimeout(() => {
+            item.classList.add('fade-in-up');
+        }, index * 50);
+    });
+});
+</script>
 
 <section style="background-color: #6DA7D2;" class="text-white text-center py-5 mt-5">
   <h2 class="fw-bold mb-3">¿Listo para aprender más?</h2>

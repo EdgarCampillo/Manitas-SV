@@ -11,53 +11,125 @@
       Cada lección incluye videos, ejercicios prácticos y recursos adicionales para ayudarte a dominar las señas.
     </p>
 
+    <!-- Barra de progreso global (solo para usuarios autenticados) -->
+    {% if user.is_authenticated %}
+    <div class="row justify-content-center mb-4 fade-in-up">
+      <div class="col-md-8">
+        <div class="card card-modern p-3">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="mb-0"><i class="bi bi-trophy"></i> Tu Progreso</h5>
+            <span class="contador-puntos">0</span>
+          </div>
+          <div class="progress" style="height: 30px; border-radius: 15px;">
+            <div class="progress-bar barra-progreso-global" 
+                 role="progressbar" 
+                 style="width: 0%;"
+                 aria-valuenow="0" 
+                 aria-valuemin="0" 
+                 aria-valuemax="100">
+              <span class="progreso-texto">0/4 lecciones</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
     <!-- Tarjetas en una sola fila responsiva -->
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
 
       <!-- Lección 1 -->
       <div class="col">
-        <div class="card h-100 shadow-sm border-0">
-          <img src="{% static 'img/saludo basico.png' %}" class="card-img-top" alt="Lección 1">
+        <div class="card h-100 shadow-sm border-0 card-modern fade-in-up" style="animation-delay: 0.1s;">
+          <div class="position-relative overflow-hidden">
+            <img src="{% static 'img/saludo basico.png' %}" class="card-img-top" alt="Lección 1">
+            <span class="badge badge-progreso bg-success position-absolute top-0 end-0 m-2" data-leccion="leccion1">
+              <i class="bi bi-unlock"></i> Disponible
+            </span>
+          </div>
           <div class="card-body">
             <h5 class="card-title fw-bold">Lección 1: Saludos Básicos</h5>
             <p class="card-text">Aprende a saludar y presentarte en LESSA con videos y ejercicios interactivos.</p>
-            <a href="{% url 'leccion1' %}" class="btn btn-morado-outline fw-bold">Comenzar Lección</a>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <a href="{% url 'leccion1' %}" class="btn btn-morado-outline fw-bold">
+                <i class="bi bi-play-circle"></i> Comenzar Lección
+              </a>
+              <small class="text-muted">
+                <i class="bi bi-clock"></i> ~15 min
+              </small>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Lección 2 -->
       <div class="col">
-        <div class="card h-100 shadow-sm border-0">
-          <img src="{% static 'img/departamentos.png' %}" class="card-img-top" alt="Lección 2">
+        <div class="card h-100 shadow-sm border-0 card-modern fade-in-up" style="animation-delay: 0.2s;">
+          <div class="position-relative overflow-hidden">
+            <img src="{% static 'img/departamentos.png' %}" class="card-img-top" alt="Lección 2">
+            <span class="badge badge-progreso bg-secondary position-absolute top-0 end-0 m-2" data-leccion="leccion2">
+              <i class="bi bi-circle"></i> Disponible
+            </span>
+          </div>
           <div class="card-body">
             <h5 class="card-title fw-bold">Lección 2: Departamentos de El Salvador</h5>
             <p class="card-text">Conocé los departamentos del país y sus señas correspondientes en LESSA.</p>
-            <a href="{% url 'leccion2' %}" class="btn btn-morado-outline fw-bold">Comenzar Lección</a>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <a href="{% url 'leccion2' %}" class="btn btn-morado-outline fw-bold">
+                <i class="bi bi-play-circle"></i> Comenzar Lección
+              </a>
+              <small class="text-muted">
+                <i class="bi bi-clock"></i> ~20 min
+              </small>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Lección 3 -->
       <div class="col">
-        <div class="card h-100 shadow-sm border-0">
-          <img src="{% static 'img/abecedario.png' %}" class="card-img-top" alt="Lección 3">
+        <div class="card h-100 shadow-sm border-0 card-modern fade-in-up" style="animation-delay: 0.3s;">
+          <div class="position-relative overflow-hidden">
+            <img src="{% static 'img/abecedario.png' %}" class="card-img-top" alt="Lección 3">
+            <span class="badge badge-progreso bg-secondary position-absolute top-0 end-0 m-2" data-leccion="leccion3">
+              <i class="bi bi-circle"></i> Disponible
+            </span>
+          </div>
           <div class="card-body">
             <h5 class="card-title fw-bold">Lección 3: El Abecedario</h5>
             <p class="card-text">Aprendé el abecedario en LESSA para deletrear nombres y palabras.</p>
-            <a href="{% url 'leccion3' %}" class="btn btn-morado-outline fw-bold">Comenzar Lección</a>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <a href="{% url 'leccion3' %}" class="btn btn-morado-outline fw-bold">
+                <i class="bi bi-play-circle"></i> Comenzar Lección
+              </a>
+              <small class="text-muted">
+                <i class="bi bi-clock"></i> ~25 min
+              </small>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Lección 4 -->
       <div class="col">
-        <div class="card h-100 shadow-sm border-0">
-          <img src="{% static 'img/numeros.png' %}" class="card-img-top" alt="Lección 4">
+        <div class="card h-100 shadow-sm border-0 card-modern fade-in-up" style="animation-delay: 0.4s;">
+          <div class="position-relative overflow-hidden">
+            <img src="{% static 'img/numeros.png' %}" class="card-img-top" alt="Lección 4">
+            <span class="badge badge-progreso bg-secondary position-absolute top-0 end-0 m-2" data-leccion="leccion4">
+              <i class="bi bi-circle"></i> Disponible
+            </span>
+          </div>
           <div class="card-body">
             <h5 class="card-title fw-bold">Lección 4: Números</h5>
             <p class="card-text">Aprendé a contar y expresar cantidades en LESSA con claridad.</p>
-            <a href="{% url 'leccion4' %}" class="btn btn-morado-outline fw-bold">Comenzar Lección</a>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <a href="{% url 'leccion4' %}" class="btn btn-morado-outline fw-bold">
+                <i class="bi bi-play-circle"></i> Comenzar Lección
+              </a>
+              <small class="text-muted">
+                <i class="bi bi-clock"></i> ~20 min
+              </small>
+            </div>
           </div>
         </div>
       </div>

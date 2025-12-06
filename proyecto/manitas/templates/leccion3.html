@@ -2,11 +2,13 @@
 {% load static %}
 
 {% block content %}
+<!-- Script para ejercicios interactivos -->
+<script src="{% static 'js/ejercicios.js' %}"></script>
 <section class="py-5" style="background-color: #F5F5F5;">
   <div class="container">
 
     <!-- Título principal -->
-    <div class="text-center mb-5">
+    <div class="text-center mb-5 fade-in-up">
       <h1 class="fw-bold" style="color: #303481;">Lección 3: El abecedario</h1>
       <p class="lead" style="color: #471396;">
         Apréndete cada una de las letras del abecedario en LESSA con videos, ejercicios interactivos e imágenes educativas.
@@ -14,8 +16,10 @@
     </div>
 
     <!-- VIDEO 1: Introducción -->
-    <div class="mb-5 p-4 rounded" style="background-color: #D6E6F2;">
-      <h3 class="fw-bold" style="color: #303481;"> ¿Qué es el abecedario en LESSA?</h3>
+    <div class="mb-5 p-4 rounded fade-in-up" style="background-color: #D6E6F2;">
+      <h3 class="fw-bold" style="color: #303481;">
+        <i class="bi bi-play-circle-fill"></i> ¿Qué es el abecedario en LESSA?
+      </h3>
       <p>Este video te introduce al tema y te muestra cómo se representa cada una de las letras del abecedario en LESSA. Ideal para comenzar.</p>
       <div class="ratio ratio-16x9 mb-3">
        <video controls>
@@ -26,9 +30,11 @@
     </div>
 
     <!-- VIDEO 2: Desarrollo -->
-    <div class="mb-5 p-4 rounded" style="background-color: #D6E6F2;">
-      <h3 class="fw-bold" style="color: #303481;">Desarrollo del tema</h3>
-      <p>Aprendé cómo cada letra del abecedario se utilizalas en diferentes contextos.</p>
+    <div class="mb-5 p-4 rounded fade-in-up" style="background-color: #D6E6F2;">
+      <h3 class="fw-bold" style="color: #303481;">
+        <i class="bi bi-book-fill"></i> Desarrollo del tema
+      </h3>
+      <p>Aprendé cómo cada letra del abecedario se utiliza en diferentes contextos.</p>
       <div class="ratio ratio-16x9 mb-3">
         <video controls>
           <source src="https://ugbedu-my.sharepoint.com/:v:/r/personal/smtr016224_ugb_edu_sv/Documents/Videos%20de%20manitas/N%C3%BAmeros/Alfabeto.mp4?download=1" type="video/mp4">
@@ -38,8 +44,10 @@
     </div>
 
     <!-- VIDEO 3: Repaso -->
-    <div class="mb-5 p-4 rounded" style="background-color: #D6E6F2;">
-      <h3 class="fw-bold" style="color: #303481;">🔁 Repaso rápido</h3>
+    <div class="mb-5 p-4 rounded fade-in-up" style="background-color: #D6E6F2;">
+      <h3 class="fw-bold" style="color: #303481;">
+        <i class="bi bi-arrow-repeat"></i> Repaso rápido
+      </h3>
       <p>Un resumen visual para reforzar lo aprendido. Ideal para practicar antes de avanzar.</p>
       <div class="ratio ratio-16x9 mb-3">
         <video controls>
@@ -50,19 +58,24 @@
     </div>
 
    <!-- Imágenes educativas -->
-<div class="mb-5 p-4 rounded">
-  <h4 class="fw-bold mb-3" style="color: #303481;">👋 Aprendé visualmente con señas reales</h4>
+<div class="mb-5 p-4 rounded fade-in-up">
+  <h4 class="fw-bold mb-3" style="color: #303481;">
+    <i class="bi bi-hand-index-fill"></i> Aprendé visualmente con señas reales
+  </h4>
   <p class="lead" style="color: #471396;">
-    Las siguientes imágenes te muestran cómo realizar los saludos básicos en LESSA paso a paso. Cada gesto está ilustrado con claridad para que puedas aprender observando y practicando. Este recurso es ideal para personas sordas, familiares, docentes y cualquier persona interesada en comunicarse de forma inclusiva.
+    Las siguientes imágenes te muestran cómo realizar las letras del abecedario en LESSA paso a paso. Cada gesto está ilustrado con claridad para que puedas aprender observando y practicando. Este recurso es ideal para personas sordas, familiares, docentes y cualquier persona interesada en comunicarse de forma inclusiva.
   </p>
   <ul class="text-start" style="list-style-type: none; padding-left: 0;">
-  <li><strong>“A”</strong>  
+  <li class="mb-2">
+    <i class="bi bi-check-circle-fill"></i> <strong>"A"</strong>  
     → Se forma cerrando el puño con el pulgar a un lado, gesto firme que representa inicio y unidad.
   </li>
-  <li><strong>“V”</strong>  
-    → Se realiza extendiendo el índice y el medio en forma de “V”, evocando victoria y dualidad.
+  <li class="mb-2">
+    <i class="bi bi-check-circle-fill"></i> <strong>"V"</strong>  
+    → Se realiza extendiendo el índice y el medio en forma de "V", evocando victoria y dualidad.
   </li>
-  <li><strong>“W”</strong>  
+  <li class="mb-2">
+    <i class="bi bi-check-circle-fill"></i> <strong>"W"</strong>  
     → Se extienden tres dedos (índice, medio y anular) hacia arriba, simulando apertura y amplitud, como un saludo amplio.
   </li>
 </ul>
@@ -70,90 +83,127 @@
   <!-- Galería de imágenes -->
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-4 text-center">
     <div class="col">
-        <img src="{% static 'img/a.png' %}" class="img-fluid rounded fixed-img" alt="Seña Hola">
-        <p class="mt-2 fw-bold fs-4">A</p>
+        <div class="img-container">
+          <img src="{% static 'img/a.png' %}" class="fixed-img" alt="Seña Letra A">
+        </div>
+        <p class="mt-3 fw-bold fs-4">A</p>
     </div>
     <div class="col">
-        <img src="{% static 'img/v.png' %}" class="img-fluid rounded fixed-img" alt="Seña Buenas Tardes">
-        <p class="mt-2 fw-bold fs-4">V</p>
+        <div class="img-container">
+          <img src="{% static 'img/v.png' %}" class="fixed-img" alt="Seña Letra V">
+        </div>
+        <p class="mt-3 fw-bold fs-4">V</p>
     </div>
     <div class="col">
-        <img src="{% static 'img/w.png' %}" class="img-fluid rounded fixed-img" alt="Seña Buenos Noches">
-        <p class="mt-2 fw-bold fs-4">W</p>
+        <div class="img-container">
+          <img src="{% static 'img/w.png' %}" class="fixed-img" alt="Seña Letra W">
+        </div>
+        <p class="mt-3 fw-bold fs-4">W</p>
     </div>
     </div>
 
 </div>
 
 
- <!-- MINI JUEGO: ¿Cómo saludarías? -->
-<section class="py-5" style="background-color: #F5F5F5;">
+ <!-- MINI JUEGO: ¿Cómo representarías una letra? -->
+<section class="py-5 ejercicios-section fade-in-up" style="background-color: #F5F5F5;">
   <div class="container text-center">
-    <h2 class="fw-bold mb-4" style="color: #303481;">🎯 Actividad: ¿Cómo representarías una letra?</h2>
+    <h2 class="fw-bold mb-4" style="color: #303481;">
+      <i class="bi bi-bullseye"></i> Actividad: ¿Cómo representarías una letra?
+    </h2>
     <p class="lead" style="color: #471396;">
       Observá la situación y elegí la seña correcta haciendo clic en la imagen.
     </p>
 
     <!-- Pregunta 1 -->
-    <div class="mb-5 p-4 rounded" style="background-color: #D6E6F2;">
-      <h4 class="fw-bold" style="color: #303481;">👨‍👩‍👦 Situación 1: la letra "A"</h4>
+    <div class="mb-5 p-4 rounded pregunta-container fade-in-up" data-pregunta-id="1" style="background-color: #D6E6F2;">
+      <h4 class="fw-bold" style="color: #303481;">
+        <i class="bi bi-type"></i> Situación 1: La letra "A"
+      </h4>
+      <p class="text-muted mb-3">¿Cuál es la seña correcta para representar la letra A?</p>
       <div class="row row-cols-1 row-cols-md-3 g-4 mt-3">
         <div class="col">
-          <img src="{% static 'img/a.png' %}" class="img-fluid rounded shadow-sm"
-               alt="Letra A" onclick="alert('✅ Correcto: ¡La letra A es la seña adecuada!')">
+          <div class="ejercicio-img" data-correct="true">
+            <img src="{% static 'img/a.png' %}" class="img-fluid rounded shadow-sm"
+                 alt="Letra A">
+          </div>
         </div>
         <div class="col">
-          <img src="{% static 'img/w.png' %}" class="img-fluid rounded shadow-sm"
-               alt="Letra W" onclick="alert('❌ No es correcto, intentá de nuevo.')">
+          <div class="ejercicio-img" data-correct="false">
+            <img src="{% static 'img/w.png' %}" class="img-fluid rounded shadow-sm"
+                 alt="Letra W">
+          </div>
         </div>
         <div class="col">
-          <img src="{% static 'img/v.png' %}" class="img-fluid rounded shadow-sm"
-               alt="Letra V" onclick="alert('❌ No es correcto, intentá de nuevo.')">
+          <div class="ejercicio-img" data-correct="false">
+            <img src="{% static 'img/v.png' %}" class="img-fluid rounded shadow-sm"
+                 alt="Letra V">
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Pregunta 2 -->
-    <div class="mb-5 p-4 rounded" style="background-color: #D6E6F2;">
-      <h4 class="fw-bold" style="color: #303481;">🏫 Situación 2: La letra "W"</h4>
+    <div class="mb-5 p-4 rounded pregunta-container fade-in-up" data-pregunta-id="2" style="background-color: #D6E6F2;">
+      <h4 class="fw-bold" style="color: #303481;">
+        <i class="bi bi-type"></i> Situación 2: La letra "W"
+      </h4>
+      <p class="text-muted mb-3">¿Cuál es la seña correcta para representar la letra W?</p>
       <div class="row row-cols-1 row-cols-md-3 g-4 mt-3">
         <div class="col">
-          <img src="{% static 'img/w.png' %}" class="img-fluid rounded shadow-sm"
-               alt="Letra W" onclick="alert('✅ Correcto: ¡La letra W es la seña adecuada!')">
+          <div class="ejercicio-img" data-correct="true">
+            <img src="{% static 'img/w.png' %}" class="img-fluid rounded shadow-sm"
+                 alt="Letra W">
+          </div>
         </div>
         <div class="col">
-          <img src="{% static 'img/v.png' %}" class="img-fluid rounded shadow-sm"
-               alt="Letra V " onclick="alert('❌ No es correcto, intentá de nuevo.')">
+          <div class="ejercicio-img" data-correct="false">
+            <img src="{% static 'img/v.png' %}" class="img-fluid rounded shadow-sm"
+                 alt="Letra V">
+          </div>
         </div>
         <div class="col">
-          <img src="{% static 'img/a.png' %}" class="img-fluid rounded shadow-sm"
-               alt="Letra A" onclick="alert('❌ No es correcto, intentá de nuevo.')">
+          <div class="ejercicio-img" data-correct="false">
+            <img src="{% static 'img/a.png' %}" class="img-fluid rounded shadow-sm"
+                 alt="Letra A">
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Pregunta 3 -->
-    <div class="mb-5 p-4 rounded" style="background-color: #D6E6F2;">
-      <h4 class="fw-bold" style="color: #303481;">🌙 Situación 3: La letra "V"</h4>
+    <div class="mb-5 p-4 rounded pregunta-container fade-in-up" data-pregunta-id="3" style="background-color: #D6E6F2;">
+      <h4 class="fw-bold" style="color: #303481;">
+        <i class="bi bi-type"></i> Situación 3: La letra "V"
+      </h4>
+      <p class="text-muted mb-3">¿Cuál es la seña correcta para representar la letra V?</p>
       <div class="row row-cols-1 row-cols-md-3 g-4 mt-3">
         <div class="col">
-          <img src="{% static 'img/v.png' %}" class="img-fluid rounded shadow-sm"
-               alt="Letra V" onclick="alert('✅ Correcto: ¡La letra V es la seña adecuada!')">
+          <div class="ejercicio-img" data-correct="true">
+            <img src="{% static 'img/v.png' %}" class="img-fluid rounded shadow-sm"
+                 alt="Letra V">
+          </div>
         </div>
         <div class="col">
-          <img src="{% static 'img/a.png' %}" class="img-fluid rounded shadow-sm"
-               alt="Letra A" onclick="alert('❌ No es correcto, intentá de nuevo.')">
+          <div class="ejercicio-img" data-correct="false">
+            <img src="{% static 'img/a.png' %}" class="img-fluid rounded shadow-sm"
+                 alt="Letra A">
+          </div>
         </div>
         <div class="col">
-          <img src="{% static 'img/w.png' %}" class="img-fluid rounded shadow-sm"
-               alt="Letra W" onclick="alert('❌ No es correcto, intentá de nuevo.')">
+          <div class="ejercicio-img" data-correct="false">
+            <img src="{% static 'img/w.png' %}" class="img-fluid rounded shadow-sm"
+                 alt="Letra W">
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Final -->
-    <div class="mt-4">
-      <p class="fw-bold" style="color: #303481;">👏 ¡Excelente! Practicá estas señas frente al espejo o con un compañero.</p>
+    <div class="mt-4 fade-in-up">
+      <p class="fw-bold" style="color: #303481;">
+        <i class="bi bi-hand-thumbs-up-fill"></i> ¡Excelente! Practicá estas señas frente al espejo o con un compañero.
+      </p>
     </div>
   </div>
 </section>
@@ -161,22 +211,30 @@
 
 
 <!-- Sección para familiares -->
-<div class="mb-5 p-4 rounded">
-  <h4 class="fw-bold mb-3" style="color: #303481;"> Para familiares y amigos</h4>
+<div class="mb-5 p-4 rounded fade-in-up">
+  <h4 class="fw-bold mb-3" style="color: #303481;">
+    <i class="bi bi-heart-fill"></i> Para familiares y amigos
+  </h4>
   <p class="lead" style="color: #471396;">
     Aprender LESSA no es solo para la persona sorda: es una oportunidad para toda la familia de comunicarse mejor, compartir momentos y construir un entorno inclusivo. 
     Aquí encontrarás recursos que te ayudarán a acompañar y motivar el aprendizaje día a día.
   </p>
   
   <ul class="text-start" style="list-style-type: none; padding-left: 0;">
-    <li>📘 <strong>Guía rápida de señas básicas</strong>  
-        → Perfecta para comenzar a practicar saludos y frases cotidianas en casa.</li>
-    <li>🎥 <strong>Video de apoyo</strong>  
-        → Consejos prácticos para acompañar el aprendizaje y hacerlo divertido en familia.</li>
+    <li class="mb-2">
+      <i class="bi bi-book-fill"></i> <strong>Guía rápida de señas básicas</strong>  
+        → Perfecta para comenzar a practicar saludos y frases cotidianas en casa.
+    </li>
+    <li class="mb-2">
+      <i class="bi bi-camera-video-fill"></i> <strong>Video de apoyo</strong>  
+        → Consejos prácticos para acompañar el aprendizaje y hacerlo divertido en familia.
+    </li>
   </ul>
 
   <div class="mt-4 p-3 rounded" style="background-color: #FFF200;">
-    <h5 class="fw-bold" style="color: #303481;">💡 Tip motivador</h5>
+    <h5 class="fw-bold" style="color: #303481;">
+      <i class="bi bi-lightbulb-fill"></i> Tip motivador
+    </h5>
     <p style="color: #471396;">
       En la sección <strong>Ejercicios</strong> de esta página encontrarás actividades interactivas para seguir practicando y reforzar lo aprendido. 
       ¡Cada práctica es un paso hacia una comunicación más inclusiva y cercana!
@@ -184,15 +242,15 @@
   </div>
 
   <p class="mt-3 fw-bold" style="color: #303481;">
-    🌟 Recordá: aprender juntos fortalece la unión familiar y abre puertas a un mundo más inclusivo.
+    <i class="bi bi-star-fill"></i> Recordá: aprender juntos fortalece la unión familiar y abre puertas a un mundo más inclusivo.
   </p>
 </div>
 
 
     <!-- Botón para avanzar -->
-    <div class="text-center">
-      <a href="{% url 'lecciones' %}" class="btn btn-lg fw-bold" style="background-color: #471396; color: white;">
-        Volver a Lecciones
+    <div class="text-center fade-in-up">
+      <a href="{% url 'lecciones' %}" class="btn btn-lg fw-bold btn-morado">
+        <i class="bi bi-arrow-left"></i> Volver a Lecciones
       </a>
     </div>
 

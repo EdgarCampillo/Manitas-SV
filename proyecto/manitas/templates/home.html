@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home-styles.css' %}">
+{% endblock %}
+
 {% block content %}
 
 <!-- ============================
@@ -33,30 +37,35 @@
 <!-- ============================
               HERO / BANNER
 ================================= -->
-<section class="hero-manitas text-white py-5" style="width: 100%;">
-  <div class="container-fluid text-center d-flex flex-column align-items-center">
-
-    <h1 class="fw-bold mb-3" style="color: white;">
+<section class="hero-manitas text-white position-relative overflow-hidden">
+  <div class="hero-particles"></div>
+  <div class="container text-center d-flex flex-column align-items-center justify-content-center position-relative" style="min-height: 600px; padding: 80px 20px;">
+    <h1 class="fw-bold mb-3 hero-title fade-in-up">
       Aprendé LESSA de forma fácil, interactiva y ¡a tu ritmo!
     </h1>
 
-
-    <p class="lead mb-4">
+    <p class="lead mb-4 hero-subtitle fade-in-up">
       Tu plataforma inclusiva para aprender el Lenguaje de Señas Salvadoreño —
       desde cero y sin complicaciones.
     </p>
 
     <!-- BOTONES -->
-    <div class="d-flex justify-content-center flex-wrap gap-3 mt-4">
-      <a href="#" class="btn btn-amarillo btn-lg fw-bold px-4">Aprender ahora</a>
-      <a href="{% url 'diccionario_visual' %}" class="btn btn-morado-outline btn-lg fw-bold px-4">Diccionario de Señas</a>
-      <a href="{% url 'registrate' %}" class="btn btn-morado btn-lg fw-bold px-4">Crear Cuenta</a>
+    <div class="d-flex justify-content-center flex-wrap gap-3 mt-4 hero-buttons fade-in-up">
+      <a href="{% url 'lecciones' %}" class="btn btn-amarillo btn-lg fw-bold px-5 py-3 btn-hero">
+        <i class="bi bi-play-circle-fill me-2"></i>Aprender ahora
+      </a>
+      <a href="{% url 'diccionario_visual' %}" class="btn btn-morado-outline btn-lg fw-bold px-5 py-3 btn-hero">
+        <i class="bi bi-book-fill me-2"></i>Diccionario de Señas
+      </a>
+      <a href="{% url 'registrate' %}" class="btn btn-morado btn-lg fw-bold px-5 py-3 btn-hero">
+        <i class="bi bi-person-plus-fill me-2"></i>Crear Cuenta
+      </a>
     </div>
 
-   <div class="mt-5 w-100 d-flex justify-content-center">
-    <div class="banner-container text-center" style="max-width: 1400px;">
+   <div class="mt-5 w-100 d-flex justify-content-center fade-in-up">
+    <div class="banner-container text-center">
       <img src="{% static 'img/Banner inicial.png' %}" alt="banner inferior"
-          class="img-fluid" style="width: 100%; height: auto;">
+          class="img-fluid banner-img">
     </div>
   </div>
 
@@ -66,14 +75,14 @@
 <!-- ============================
           ¿QUÉ ES MANITAS SV?
 ================================= -->
-<section class="py-5">
-  <div class="container text-center">
-    <h2 class="fw-bold mb-3">¿Qué es Manitas SV?</h2>
-    <p class="lead">
+<section class="py-5 section-modern">
+  <div class="container text-center" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+    <h2 class="fw-bold mb-3 section-title">¿Qué es Manitas SV?</h2>
+    <p class="lead section-text">
       Manitas SV es un proyecto educativo diseñado para que cualquier persona pueda aprender
       el <strong>Lenguaje de Señas Salvadoreño (LESSA)</strong> de manera clara, práctica y divertida.
     </p>
-    <p>
+    <p class="section-text">
       Está pensado para estudiantes, docentes, familias, instituciones y cualquier persona
       interesada en promover la inclusión en El Salvador.
     </p>
@@ -83,24 +92,39 @@
 <!-- ============================
         ¿PARA QUÉ SIRVE?
 ================================= -->
-<section class="bg-light py-5">
-  <div class="container">
-    <h2 class="fw-bold text-center mb-4">¿Para qué sirve este sitio?</h2>
+<section class="py-5 bg-light section-modern">
+  <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+    <h2 class="fw-bold text-center mb-5 section-title">¿Para qué sirve este sitio?</h2>
 
     <div class="row text-center">
-      <div class="col-md-4 mb-3">
-        <i class="bi bi-book-half fs-1" style="color: #090040;"></i>
-        <p class="mt-2">Aprender LESSA desde cualquier dispositivo.</p>
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <div class="icon-wrapper icon-primary">
+            <i class="bi bi-book-half-fill"></i>
+          </div>
+          <h5 class="mt-3 fw-bold">Aprender LESSA</h5>
+          <p class="mt-2">Desde cualquier dispositivo, en cualquier momento.</p>
+        </div>
       </div>
 
-      <div class="col-md-4 mb-3">
-        <i class="bi bi-camera-video fs-1" style="color: #090040;"></i>
-        <p class="mt-2">Videos y recursos visuales fáciles de entender.</p>
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <div class="icon-wrapper icon-primary">
+            <i class="bi bi-camera-video-fill"></i>
+          </div>
+          <h5 class="mt-3 fw-bold">Recursos Visuales</h5>
+          <p class="mt-2">Videos y recursos visuales fáciles de entender.</p>
+        </div>
       </div>
 
-      <div class="col-md-4 mb-3">
-        <i class="bi bi-people fs-1" style="color: #090040;"></i>
-        <p class="mt-2">Promueve la inclusión y comunicación accesible.</p>
+      <div class="col-md-4 mb-4">
+        <div class="feature-card">
+          <div class="icon-wrapper icon-primary">
+            <i class="bi bi-people-fill"></i>
+          </div>
+          <h5 class="mt-3 fw-bold">Inclusión</h5>
+          <p class="mt-2">Promueve la inclusión y comunicación accesible.</p>
+        </div>
       </div>
     </div>
 
@@ -110,29 +134,51 @@
 <!-- ============================
         LO QUE APRENDERÁS
 ================================= -->
-<section class="py-5">
-  <div class="container">
-    <h2 class="fw-bold text-center mb-4">¿Qué aprenderás aquí?</h2>
+<section class="py-5 section-modern">
+  <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold section-title">¿Qué aprenderás aquí?</h2>
+    </div>
 
     <div class="row text-center">
       <div class="col-md-3 mb-4">
-        <i class="bi bi-hand-thumbs-up fs-1" style="color: #471396;"></i>
-        <p class="mt-2">Saludos y expresiones básicas.</p>
+        <div class="feature-card">
+          <div class="icon-wrapper icon-secondary">
+            <i class="bi bi-hand-thumbs-up-fill"></i>
+          </div>
+          <h5 class="mt-3 fw-bold">Saludos Básicos</h5>
+          <p class="mt-2">Saludos y expresiones básicas.</p>
+        </div>
       </div>
 
       <div class="col-md-3 mb-4">
-        <i class="bi bi-emoji-smile fs-1" style="color: #471396;"></i>
-        <p class="mt-2">Emociones y estados de ánimo.</p>
+        <div class="feature-card">
+          <div class="icon-wrapper icon-secondary">
+            <i class="bi bi-emoji-smile-fill"></i>
+          </div>
+          <h5 class="mt-3 fw-bold">Emociones</h5>
+          <p class="mt-2">Emociones y estados de ánimo.</p>
+        </div>
       </div>
 
       <div class="col-md-3 mb-4">
-        <i class="bi bi-house-door fs-1" style="color: #471396;"></i>
-        <p class="mt-2">Vocabulario del hogar.</p>
+        <div class="feature-card">
+          <div class="icon-wrapper icon-secondary">
+            <i class="bi bi-house-door-fill"></i>
+          </div>
+          <h5 class="mt-3 fw-bold">Vocabulario</h5>
+          <p class="mt-2">Vocabulario del hogar.</p>
+        </div>
       </div>
 
       <div class="col-md-3 mb-4">
-        <i class="bi bi-journal-bookmark fs-1" style="color: #471396;"></i>
-        <p class="mt-2">Frases útiles para conversar.</p>
+        <div class="feature-card">
+          <div class="icon-wrapper icon-secondary">
+            <i class="bi bi-journal-bookmark-fill"></i>
+          </div>
+          <h5 class="mt-3 fw-bold">Frases Útiles</h5>
+          <p class="mt-2">Frases útiles para conversar.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -141,36 +187,43 @@
 <!-- ============================
      ¿CÓMO FUNCIONA MANITAS SV?
 ================================= -->
-<section class="bg-light py-5">
-  <div class="container text-center">
-    <h2 class="fw-bold mb-4">¿Cómo funciona Manitas SV?</h2>
+<section class="bg-light py-5 section-modern">
+  <div class="container text-center" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+    <h2 class="fw-bold mb-5 section-title">¿Cómo funciona Manitas SV?</h2>
 
     <div class="row">
-
-      <div class="col-md-4 mb-3">
-        <div class="p-4 bg-white shadow rounded">
-          <i class="bi bi-person-plus fs-1" style="color:#B13BFF;"></i>
-          <h5 class="fw-bold mt-2">1. Registrate</h5>
+      <div class="col-md-4 mb-4">
+        <div class="process-card">
+          <div class="process-number">1</div>
+          <div class="icon-wrapper icon-tertiary">
+            <i class="bi bi-person-plus-fill"></i>
+          </div>
+          <h5 class="fw-bold mt-3">Registrate</h5>
           <p>Accedé a más contenido y guardá tu progreso.</p>
         </div>
       </div>
 
-      <div class="col-md-4 mb-3">
-        <div class="p-4 bg-white shadow rounded">
-          <i class="bi bi-list-ul fs-1" style="color:#B13BFF;"></i>
-          <h5 class="fw-bold mt-2">2. Elegí una categoría</h5>
+      <div class="col-md-4 mb-4">
+        <div class="process-card">
+          <div class="process-number">2</div>
+          <div class="icon-wrapper icon-tertiary">
+            <i class="bi bi-list-ul"></i>
+          </div>
+          <h5 class="fw-bold mt-3">Elegí una categoría</h5>
           <p>Aprendé por niveles o por temas de vocabulario.</p>
         </div>
       </div>
 
-      <div class="col-md-4 mb-3">
-        <div class="p-4 bg-white shadow rounded">
-          <i class="bi bi-play-circle fs-1" style="color:#B13BFF;"></i>
-          <h5 class="fw-bold mt-2">3. Practicá y avanzá</h5>
+      <div class="col-md-4 mb-4">
+        <div class="process-card">
+          <div class="process-number">3</div>
+          <div class="icon-wrapper icon-tertiary">
+            <i class="bi bi-play-circle-fill"></i>
+          </div>
+          <h5 class="fw-bold mt-3">Practicá y avanzá</h5>
           <p>Videos claros y explicaciones simples.</p>
         </div>
       </div>
-
     </div>
   </div>
 </section>
@@ -178,32 +231,50 @@
 <!-- ============================
            BENEFICIOS
 ================================= -->
-<section class="py-5">
-  <div class="container text-center">
-    <h2 class="fw-bold mb-3">Beneficios del sitio</h2>
+<section class="py-5 section-modern">
+  <div class="container text-center" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+    <h2 class="fw-bold mb-5 section-title">Beneficios del sitio</h2>
 
     <div class="row mt-4">
-
-      <div class="col-md-3 mb-3">
-        <i class="bi bi-phone fs-1" style="color:#FFCC00;"></i>
-        <p>Accesible desde cualquier dispositivo.</p>
+      <div class="col-md-3 mb-4">
+        <div class="benefit-card">
+          <div class="icon-wrapper icon-benefit">
+            <i class="bi bi-phone-fill"></i>
+          </div>
+          <h6 class="mt-3 fw-bold">Accesible</h6>
+          <p class="mt-2">Desde cualquier dispositivo.</p>
+        </div>
       </div>
 
-      <div class="col-md-3 mb-3">
-        <i class="bi bi-lightbulb fs-1" style="color:#FFCC00;"></i>
-        <p>Contenido claro y amigable para todos.</p>
+      <div class="col-md-3 mb-4">
+        <div class="benefit-card">
+          <div class="icon-wrapper icon-benefit">
+            <i class="bi bi-lightbulb-fill"></i>
+          </div>
+          <h6 class="mt-3 fw-bold">Claro</h6>
+          <p class="mt-2">Contenido claro y amigable.</p>
+        </div>
       </div>
 
-      <div class="col-md-3 mb-3">
-        <i class="bi bi-flag fs-1" style="color:#FFCC00;"></i>
-        <p>Enfoque salvadoreño y cultural.</p>
+      <div class="col-md-3 mb-4">
+        <div class="benefit-card">
+          <div class="icon-wrapper icon-benefit">
+            <i class="bi bi-flag-fill"></i>
+          </div>
+          <h6 class="mt-3 fw-bold">Salvadoreño</h6>
+          <p class="mt-2">Enfoque cultural y local.</p>
+        </div>
       </div>
 
-      <div class="col-md-3 mb-3">
-        <i class="bi bi-cloud-arrow-down fs-1" style="color:#FFCC00;"></i>
-        <p>Actualizaciones constantes.</p>
+      <div class="col-md-3 mb-4">
+        <div class="benefit-card">
+          <div class="icon-wrapper icon-benefit">
+            <i class="bi bi-cloud-arrow-down-fill"></i>
+          </div>
+          <h6 class="mt-3 fw-bold">Actualizado</h6>
+          <p class="mt-2">Actualizaciones constantes.</p>
+        </div>
       </div>
-
     </div>
   </div>
 </section>
@@ -211,33 +282,34 @@
 <!-- ============================
            TESTIMONIOS
 ================================= -->
-<section class="bg-light py-5">
-  <div class="container text-center">
-    <h2 class="fw-bold mb-4">Testimonios</h2>
+<section class="bg-light py-5 section-modern">
+  <div class="container text-center" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+    <h2 class="fw-bold mb-5 section-title">Testimonios</h2>
 
     <div class="row justify-content-center">
-
-      <div class="col-md-4 mb-3">
-        <div class="p-4 bg-white shadow rounded">
-          <p>⭐ “Aprendí mis primeras 30 señas en una semana. ¡Súper fácil!”</p>
+      <div class="col-md-4 mb-4">
+        <div class="testimonial-card">
+          <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+          <p class="testimonial-text">"Aprendí mis primeras 30 señas en una semana. ¡Súper fácil!"</p>
           <h6 class="fw-bold mt-3">— Andrea, Estudiante</h6>
         </div>
       </div>
 
-      <div class="col-md-4 mb-3">
-        <div class="p-4 bg-white shadow rounded">
-          <p>⭐ “Lo usé para capacitar a mi personal. Muy práctico.”</p>
+      <div class="col-md-4 mb-4">
+        <div class="testimonial-card">
+          <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+          <p class="testimonial-text">"Lo usé para capacitar a mi personal. Muy práctico."</p>
           <h6 class="fw-bold mt-3">— Carlos, Docente</h6>
         </div>
       </div>
 
-      <div class="col-md-4 mb-3">
-        <div class="p-4 bg-white shadow rounded">
-          <p>⭐ “Me ayudó a comunicarme con mis estudiantes sordos.”</p>
+      <div class="col-md-4 mb-4">
+        <div class="testimonial-card">
+          <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+          <p class="testimonial-text">"Me ayudó a comunicarme con mis estudiantes sordos."</p>
           <h6 class="fw-bold mt-3">— Marlene, Maestra</h6>
         </div>
       </div>
-
     </div>
   </div>
 </section>
@@ -245,19 +317,28 @@
 <!-- ============================
         FRASE MOTIVACIONAL
 ================================= -->
-<section class="py-5 text-center">
-  <h2 class="fw-bold">“Ponete pilas y aprendé a comunicarte con tus manos 🇸🇻”</h2>
+<section class="py-5 section-modern">
+  <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+    <div class="d-flex justify-content-center">
+      <div class="quote-card">
+        <i class="bi bi-quote quote-icon"></i>
+        <h2 class="fw-bold quote-text">"Ponete pilas y aprendé a comunicarte con tus manos 🇸🇻"</h2>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- ============================
         CALL TO ACTION FINAL
 ================================= -->
-
-<!-- = LLAMADO A LA ACCIÓN-->
-<section style="background-color: #6DA7D2; color: white;" class="text-center py-5">
-  <h2 class="fw-bold mb-3">¡Comenzá hoy!</h2>
-  <p class="lead mb-4">Una seña a la vez, hacemos El Salvador más inclusivo.</p>
-  <a href="#" class="btn btn-light btn-lg fw-bold">Empezar a aprender</a>
+<section class="cta-section text-center py-5">
+  <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+    <h2 class="fw-bold mb-3 cta-title">¡Comenzá hoy!</h2>
+    <p class="lead mb-4 cta-text">Una seña a la vez, hacemos El Salvador más inclusivo.</p>
+    <a href="{% url 'lecciones' %}" class="btn btn-light btn-lg fw-bold px-5 py-3 cta-button">
+      <i class="bi bi-rocket-takeoff-fill me-2"></i>Empezar a aprender
+    </a>
+  </div>
 </section>
 
 {% endblock %}

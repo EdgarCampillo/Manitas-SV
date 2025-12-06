@@ -2,11 +2,13 @@
 {% load static %}
 
 {% block content %}
+<!-- Script para ejercicios interactivos -->
+<script src="{% static 'js/ejercicios.js' %}"></script>
 <section class="py-5" style="background-color: #F5F5F5;">
   <div class="container">
 
     <!-- Título principal -->
-    <div class="text-center mb-5">
+    <div class="text-center mb-5 fade-in-up">
       <h1 class="fw-bold" style="color: #303481;">Lección 1: Saludos Básicos</h1>
       <p class="lead" style="color: #471396;">
         Aprendé a saludar y presentarte en LESSA con videos, ejercicios interactivos e imágenes educativas.
@@ -14,8 +16,10 @@
     </div>
 
     <!-- VIDEO 1: Introducción -->
-    <div class="mb-5 p-4 rounded" style="background-color: #D6E6F2;">
-      <h3 class="fw-bold" style="color: #303481;"> ¿Qué son los saludos en LESSA?</h3>
+    <div class="mb-5 p-4 rounded fade-in-up" style="background-color: #D6E6F2;">
+      <h3 class="fw-bold" style="color: #303481;">
+        <i class="bi bi-play-circle-fill" style="color: #FF6B6B;"></i> ¿Qué son los saludos en LESSA?
+      </h3>
       <p>Este video te introduce al tema y te muestra cómo se saluda en LESSA. Ideal para comenzar.</p>
       <div class="ratio ratio-16x9 mb-3">
        <video controls>
@@ -26,8 +30,10 @@
     </div>
 
     <!-- VIDEO 2: Desarrollo -->
-    <div class="mb-5 p-4 rounded" style="background-color: #D6E6F2;">
-      <h3 class="fw-bold" style="color: #303481;">Desarrollo del tema</h3>
+    <div class="mb-5 p-4 rounded fade-in-up" style="background-color: #D6E6F2;">
+      <h3 class="fw-bold" style="color: #303481;">
+        <i class="bi bi-book-fill" style="color: #4ECDC4;"></i> Desarrollo del tema
+      </h3>
       <p>Aprendé cómo presentarte, decir tu nombre y saludar en diferentes contextos.</p>
       <div class="ratio ratio-16x9 mb-3">
         <video controls>
@@ -38,8 +44,10 @@
     </div>
 
     <!-- VIDEO 3: Repaso -->
-    <div class="mb-5 p-4 rounded" style="background-color: #D6E6F2;">
-      <h3 class="fw-bold" style="color: #303481;">🔁 Repaso rápido</h3>
+    <div class="mb-5 p-4 rounded fade-in-up" style="background-color: #D6E6F2;">
+      <h3 class="fw-bold" style="color: #303481;">
+        <i class="bi bi-arrow-repeat" style="color: #95E1D3;"></i> Repaso rápido
+      </h3>
       <p>Un resumen visual para reforzar lo aprendido. Ideal para practicar antes de avanzar.</p>
       <div class="ratio ratio-16x9 mb-3">
         <video controls>
@@ -50,33 +58,47 @@
     </div>
 
    <!-- Imágenes educativas -->
-<div class="mb-5 p-4 rounded">
-  <h4 class="fw-bold mb-3" style="color: #303481;">👋 Aprendé visualmente con señas reales</h4>
+<div class="mb-5 p-4 rounded fade-in-up">
+  <h4 class="fw-bold mb-3" style="color: #303481;">
+    <i class="bi bi-hand-index-fill" style="color: #FF6B6B;"></i> Aprendé visualmente con señas reales
+  </h4>
   <p class="lead" style="color: #471396;">
     Las siguientes imágenes te muestran cómo realizar los saludos básicos en LESSA paso a paso. Cada gesto está ilustrado con claridad para que puedas aprender observando y practicando. Este recurso es ideal para personas sordas, familiares, docentes y cualquier persona interesada en comunicarse de forma inclusiva.
   </p>
   <ul class="text-start" style="list-style-type: none; padding-left: 0;">
-    <li><strong>“Hola”</strong>  
-      → Un saludo universal que se realiza con la mano cerca de la frente, como un gesto de bienvenida.</li>
-    <li><strong>“Buenos Tardes”</strong>  
-      → Se inicia tocando los labios con los dedos y luego se extiende la mano hacia abajo, representando el saludo vespertino.</li>
-    <li><strong>“Buenos Noches”</strong>  
-      → Comienza igual que “Buenos Tardes”, pero se acompaña de un movimiento más amplio con ambas manos, simulando el cierre del día.</li>
+    <li class="mb-2">
+      <i class="bi bi-check-circle-fill" style="color: #28a745;"></i> <strong>"Hola"</strong>  
+      → Un saludo universal que se realiza con la mano cerca de la frente, como un gesto de bienvenida.
+    </li>
+    <li class="mb-2">
+      <i class="bi bi-check-circle-fill" style="color: #28a745;"></i> <strong>"Buenos Tardes"</strong>  
+      → Se inicia tocando los labios con los dedos y luego se extiende la mano hacia abajo, representando el saludo vespertino.
+    </li>
+    <li class="mb-2">
+      <i class="bi bi-check-circle-fill" style="color: #28a745;"></i> <strong>"Buenos Noches"</strong>  
+      → Comienza igual que "Buenos Tardes", pero se acompaña de un movimiento más amplio con ambas manos, simulando el cierre del día.
+    </li>
   </ul>
 
   <!-- Galería de imágenes -->
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-4 text-center">
     <div class="col">
-        <img src="{% static 'img/hola.png' %}" class="img-fluid rounded fixed-img" alt="Seña Hola">
-        <p class="mt-2 fw-bold fs-4">Hola</p>
+        <div class="img-container">
+          <img src="{% static 'img/hola.png' %}" class="fixed-img" alt="Seña Hola">
+        </div>
+        <p class="mt-3 fw-bold fs-4">Hola</p>
     </div>
     <div class="col">
-        <img src="{% static 'img/buenas tardes.png' %}" class="img-fluid rounded fixed-img" alt="Seña Buenos Tardes">
-        <p class="mt-2 fw-bold fs-4">Buenas Tardes</p>
+        <div class="img-container">
+          <img src="{% static 'img/buenas tardes.png' %}" class="fixed-img" alt="Seña Buenos Tardes">
+        </div>
+        <p class="mt-3 fw-bold fs-4">Buenas Tardes</p>
     </div>
     <div class="col">
-        <img src="{% static 'img/buenas noches.png' %}" class="img-fluid rounded fixed-img" alt="Seña Buenos Noches">
-        <p class="mt-2 fw-bold fs-4">Buenas Noches</p>
+        <div class="img-container">
+          <img src="{% static 'img/buenas noches.png' %}" class="fixed-img" alt="Seña Buenos Noches">
+        </div>
+        <p class="mt-3 fw-bold fs-4">Buenas Noches</p>
     </div>
     </div>
 
@@ -84,73 +106,104 @@
 
 
  <!-- MINI JUEGO: ¿Cómo saludarías? -->
-<section class="py-5" style="background-color: #F5F5F5;">
+<section class="py-5 ejercicios-section fade-in-up" style="background-color: #F5F5F5;">
   <div class="container text-center">
-    <h2 class="fw-bold mb-4" style="color: #303481;">🎯 Actividad: ¿Cómo saludarías?</h2>
+    <h2 class="fw-bold mb-4" style="color: #303481;">
+      <i class="bi bi-bullseye" style="color: #FF6B6B;"></i> Actividad: ¿Cómo saludarías?
+    </h2>
     <p class="lead" style="color: #471396;">
       Observá la situación y elegí la seña correcta haciendo clic en la imagen.
     </p>
 
     <!-- Pregunta 1 -->
-    <div class="mb-5 p-4 rounded" style="background-color: #D6E6F2;">
-      <h4 class="fw-bold" style="color: #303481;">👨‍👩‍👦 Situación 1: Te encontrás con un amigo en la tarde</h4>
+    <div class="mb-5 p-4 rounded pregunta-container fade-in-up" data-pregunta-id="1" style="background-color: #D6E6F2;">
+      <h4 class="fw-bold" style="color: #303481;">
+        <i class="bi bi-people-fill" style="color: #FF6B6B;"></i> Situación 1: Te encontrás con un amigo en la tarde
+      </h4>
+      <p class="text-muted mb-3">¿Cuál es la seña correcta para saludar en la tarde?</p>
       <div class="row row-cols-1 row-cols-md-3 g-4 mt-3">
         <div class="col">
-          <img src="{% static 'img/buenas tardes.png' %}" class="img-fluid rounded shadow-sm"
-               alt="Buenos días" onclick="alert('✅ Correcto: ¡Buenas tardes es la seña adecuada!')">
+          <div class="ejercicio-img" data-correct="true">
+            <img src="{% static 'img/buenas tardes.png' %}" class="img-fluid rounded shadow-sm"
+                 alt="Buenas tardes">
+          </div>
         </div>
         <div class="col">
-          <img src="{% static 'img/buenas noches.png' %}" class="img-fluid rounded shadow-sm"
-               alt="Buenas noches" onclick="alert('❌ No es correcto, intentá de nuevo.')">
+          <div class="ejercicio-img" data-correct="false">
+            <img src="{% static 'img/buenas noches.png' %}" class="img-fluid rounded shadow-sm"
+                 alt="Buenas noches">
+          </div>
         </div>
         <div class="col">
-          <img src="{% static 'img/hola.png' %}" class="img-fluid rounded shadow-sm"
-               alt="Hola" onclick="alert('❌ No es correcto, intentá de nuevo.')">
+          <div class="ejercicio-img" data-correct="false">
+            <img src="{% static 'img/hola.png' %}" class="img-fluid rounded shadow-sm"
+                 alt="Hola">
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Pregunta 2 -->
-    <div class="mb-5 p-4 rounded" style="background-color: #D6E6F2;">
-      <h4 class="fw-bold" style="color: #303481;">🏫 Situación 2: Llegás a casa en la noche</h4>
+    <div class="mb-5 p-4 rounded pregunta-container fade-in-up" data-pregunta-id="2" style="background-color: #D6E6F2;">
+      <h4 class="fw-bold" style="color: #303481;">
+        <i class="bi bi-house-door-fill" style="color: #4ECDC4;"></i> Situación 2: Llegás a casa en la noche
+      </h4>
+      <p class="text-muted mb-3">¿Cuál es la seña correcta para saludar en la noche?</p>
       <div class="row row-cols-1 row-cols-md-3 g-4 mt-3">
         <div class="col">
-          <img src="{% static 'img/buenas noches.png' %}" class="img-fluid rounded shadow-sm"
-               alt="Buenas tardes" onclick="alert('✅ Correcto: ¡Buenas noches es la seña adecuada!')">
+          <div class="ejercicio-img" data-correct="true">
+            <img src="{% static 'img/buenas noches.png' %}" class="img-fluid rounded shadow-sm"
+                 alt="Buenas noches">
+          </div>
         </div>
         <div class="col">
-          <img src="{% static 'img/hola.png' %}" class="img-fluid rounded shadow-sm"
-               alt="Hola" onclick="alert('❌ No es correcto, intentá de nuevo.')">
+          <div class="ejercicio-img" data-correct="false">
+            <img src="{% static 'img/hola.png' %}" class="img-fluid rounded shadow-sm"
+                 alt="Hola">
+          </div>
         </div>
         <div class="col">
-          <img src="{% static 'img/buenas tardes.png' %}" class="img-fluid rounded shadow-sm"
-               alt="Buenas noches" onclick="alert('❌ No es correcto, intentá de nuevo.')">
+          <div class="ejercicio-img" data-correct="false">
+            <img src="{% static 'img/buenas tardes.png' %}" class="img-fluid rounded shadow-sm"
+                 alt="Buenas tardes">
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Pregunta 3 -->
-    <div class="mb-5 p-4 rounded" style="background-color: #D6E6F2;">
-      <h4 class="fw-bold" style="color: #303481;">🌙 Situación 3: Te despedís antes de dormir</h4>
+    <div class="mb-5 p-4 rounded pregunta-container fade-in-up" data-pregunta-id="3" style="background-color: #D6E6F2;">
+      <h4 class="fw-bold" style="color: #303481;">
+        <i class="bi bi-moon-fill" style="color: #95E1D3;"></i> Situación 3: Te despedís antes de dormir
+      </h4>
+      <p class="text-muted mb-3">¿Cuál es la seña correcta para despedirse antes de dormir?</p>
       <div class="row row-cols-1 row-cols-md-3 g-4 mt-3">
         <div class="col">
-          <img src="{% static 'img/buenas noches.png' %}" class="img-fluid rounded shadow-sm"
-               alt="Buenas noches" onclick="alert('✅ Correcto: ¡Buenas noches es la seña adecuada!')">
+          <div class="ejercicio-img" data-correct="true">
+            <img src="{% static 'img/buenas noches.png' %}" class="img-fluid rounded shadow-sm"
+                 alt="Buenas noches">
+          </div>
         </div>
         <div class="col">
-          <img src="{% static 'img/buenas tardes.png' %}" class="img-fluid rounded shadow-sm"
-               alt="Buenos días" onclick="alert('❌ No es correcto, intentá de nuevo.')">
+          <div class="ejercicio-img" data-correct="false">
+            <img src="{% static 'img/buenas tardes.png' %}" class="img-fluid rounded shadow-sm"
+                 alt="Buenas tardes">
+          </div>
         </div>
         <div class="col">
-          <img src="{% static 'img/hola.png' %}" class="img-fluid rounded shadow-sm"
-               alt="Hola" onclick="alert('❌ No es correcto, intentá de nuevo.')">
+          <div class="ejercicio-img" data-correct="false">
+            <img src="{% static 'img/hola.png' %}" class="img-fluid rounded shadow-sm"
+                 alt="Hola">
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Final -->
-    <div class="mt-4">
-      <p class="fw-bold" style="color: #303481;">👏 ¡Excelente! Practicá estas señas frente al espejo o con un compañero.</p>
+    <div class="mt-4 fade-in-up">
+      <p class="fw-bold" style="color: #303481;">
+        <i class="bi bi-hand-thumbs-up-fill" style="color: #28a745;"></i> ¡Excelente! Practicá estas señas frente al espejo o con un compañero.
+      </p>
     </div>
   </div>
 </section>
@@ -158,22 +211,30 @@
 
 
 <!-- Sección para familiares -->
-<div class="mb-5 p-4 rounded">
-  <h4 class="fw-bold mb-3" style="color: #303481;"> Para familiares y amigos</h4>
+<div class="mb-5 p-4 rounded fade-in-up">
+  <h4 class="fw-bold mb-3" style="color: #303481;">
+    <i class="bi bi-heart-fill" style="color: #FF6B6B;"></i> Para familiares y amigos
+  </h4>
   <p class="lead" style="color: #471396;">
     Aprender LESSA no es solo para la persona sorda: es una oportunidad para toda la familia de comunicarse mejor, compartir momentos y construir un entorno inclusivo. 
     Aquí encontrarás recursos que te ayudarán a acompañar y motivar el aprendizaje día a día.
   </p>
   
   <ul class="text-start" style="list-style-type: none; padding-left: 0;">
-    <li>📘 <strong>Guía rápida de señas básicas</strong>  
-        → Perfecta para comenzar a practicar saludos y frases cotidianas en casa.</li>
-    <li>🎥 <strong>Video de apoyo</strong>  
-        → Consejos prácticos para acompañar el aprendizaje y hacerlo divertido en familia.</li>
+    <li class="mb-2">
+      <i class="bi bi-book-fill" style="color: #4ECDC4;"></i> <strong>Guía rápida de señas básicas</strong>  
+        → Perfecta para comenzar a practicar saludos y frases cotidianas en casa.
+    </li>
+    <li class="mb-2">
+      <i class="bi bi-camera-video-fill" style="color: #FF6B6B;"></i> <strong>Video de apoyo</strong>  
+        → Consejos prácticos para acompañar el aprendizaje y hacerlo divertido en familia.
+    </li>
   </ul>
 
   <div class="mt-4 p-3 rounded" style="background-color: #FFF200;">
-    <h5 class="fw-bold" style="color: #303481;">💡 Tip motivador</h5>
+    <h5 class="fw-bold" style="color: #303481;">
+      <i class="bi bi-lightbulb-fill" style="color: #FFD93D;"></i> Tip motivador
+    </h5>
     <p style="color: #471396;">
       En la sección <strong>Ejercicios</strong> de esta página encontrarás actividades interactivas para seguir practicando y reforzar lo aprendido. 
       ¡Cada práctica es un paso hacia una comunicación más inclusiva y cercana!
@@ -181,15 +242,15 @@
   </div>
 
   <p class="mt-3 fw-bold" style="color: #303481;">
-    🌟 Recordá: aprender juntos fortalece la unión familiar y abre puertas a un mundo más inclusivo.
+    <i class="bi bi-star-fill" style="color: #FFD93D;"></i> Recordá: aprender juntos fortalece la unión familiar y abre puertas a un mundo más inclusivo.
   </p>
 </div>
 
 
     <!-- Botón para avanzar -->
-    <div class="text-center">
-      <a href="{% url 'lecciones' %}" class="btn btn-lg fw-bold" style="background-color: #471396; color: white;">
-        Volver a Lecciones
+    <div class="text-center fade-in-up">
+      <a href="{% url 'lecciones' %}" class="btn btn-lg fw-bold btn-morado">
+        <i class="bi bi-arrow-left"></i> Volver a Lecciones
       </a>
     </div>
 

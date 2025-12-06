@@ -12,6 +12,12 @@
 
   <!-- CSS Personalizado -->
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <link rel="stylesheet" href="{% static 'css/iconos-colores.css' %}">
+  {% block extra_css %}{% endblock %}
+  
+  <!-- Meta tags para mejor SEO y accesibilidad -->
+  <meta name="description" content="Aprende Lenguaje de Señas Salvadoreño (LESSA) de forma interactiva y profesional">
+  <meta name="keywords" content="LESSA, lengua de señas, El Salvador, inclusión, educación">
 </head>
 
 <body>
@@ -96,7 +102,7 @@
 {% endif %}
 
 <!-- CONTENIDO PRINCIPAL -->
-<main class="container mt-4 mb-4">
+<main>
   {% block content %}
   {% endblock %}
 </main>
@@ -140,6 +146,9 @@
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Sistema de Progreso -->
+<script src="{% static 'js/progreso.js' %}"></script>
 
 <!-- Script para mostrar/ocultar el panel de perfil -->
 <script>
