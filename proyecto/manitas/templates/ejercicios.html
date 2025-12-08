@@ -1,5 +1,27 @@
+
 {% extends "base.html" %}
 {% load static %}
+
+{% block extra_css %}
+<style>
+  .btn-morado {
+    background: linear-gradient(90deg, #471396, #B13BFF);
+    border: none;
+    color: white;
+    font-weight: bold;
+  }
+  .btn-morado:hover {
+    background: linear-gradient(90deg, #5a1ab8, #c14dff);
+    color: white;
+  }
+  #canvas-senas {
+    transform: scaleX(-1); /* Espejo para mejor UX */
+  }
+  #video-senas {
+    transform: scaleX(-1); /* Espejo para mejor UX */
+  }
+</style>
+{% endblock %}
 
 {% block content %}
 <section class="py-5" style="background-color: #F5F5F5;">
@@ -7,44 +29,136 @@
 
     <!-- Título principal -->
     <div class="text-center mb-5">
-      <h1 class="fw-bold" style="color: #303481;">Ejercicios Interactivos en desarrollo.</h1>
-      <p class="lead" style="color: #471396;">
-        Practicá lo aprendido en las lecciones con nuestros ejercicios interactivos diseñados para reforzar tus habilidades en LESSA.
-      </p>
-        <p>Deslizá hacia abajo para verlas.</p>
+      <h1 class="fw-bold" style="color: #303481;">Ejercicios Interactivos</h1>
+      {% if user.is_staff %}
+      <div class="mt-3">
+        <a href="{% url 'admin_train_signs' %}" class="btn btn-warning">
+          <i class="bi bi-gear-fill"></i> Entrenar Señas (Admin)
+        </a>
+      </div>
+      {% endif %}
     </div>
 
-    <div class="mt-5 w-100 d-flex justify-content-center">
-        <div class="banner-container text-center" style="max-width: 1000px;">
-        <img src="{% static 'img/SITIO-EN-CONSTRUCCION.jpg' %}" alt="banner inferior"
-            class="img-fluid" style="width: 100%; height: auto;">
-            <p class="mt-3 fst-italic">¡Próximamente ejercicios disponibles!</p>
+    <!-- Sección de Reconocimiento de Señas con Cámara -->
+    <div class="card shadow-lg mb-4" style="background-color: #D6E6F2;">
+      <div class="card-body p-4">
+        <h3 class="fw-bold text-center mb-4" style="color: #303481;">
+          <i class="bi bi-camera-video-fill"></i> Ejercicios de Reconocimiento de Señas
+        </h3>
+        
+        <!-- Selector de Categoría -->
+        <div class="mb-4">
+          <label for="category-select" class="form-label fw-bold" style="color: #303481;">Seleccioná una categoría:</label>
+          <select id="category-select" class="form-select form-select-lg">
+            <option value="">-- Seleccioná una categoría --</option>
+            <option value="alfabeto">Alfabeto</option>
+            <option value="numeros">Números</option>
+            <option value="departamentos">Departamentos de El Salvador</option>
+            <option value="saludos">Saludos Básicos</option>
+          </select>
         </div>
+        
+        <div id="exercise-info" class="text-center mb-4" style="display: none;">
+          <h4 class="fw-bold" style="color: #471396;" id="exercise-title">Preparando ejercicio...</h4>
+          <p class="lead" id="exercise-description"></p>
+          <!-- Área para mostrar estándar de referencia (solo imagen para usuarios normales) -->
+          <div id="standard-reference" class="mt-3 mb-3" style="display: none;">
+            <p class="small text-muted"><strong>Referencia:</strong></p>
+            <img id="standard-image" src="" alt="Referencia" style="max-width: 200px; border-radius: 8px; display: none;">
+            <video id="standard-video" controls style="max-width: 300px; border-radius: 8px; display: none;">
+              Tu navegador no soporta videos.
+            </video>
+          </div>
+          <div class="alert alert-light mt-3">
+            <small><i class="bi bi-info-circle"></i> <strong>Consejo:</strong> Asegurate de tener buena iluminación y mostrar tu mano completa frente a la cámara. Mantené la seña por 2 segundos para que se detecte correctamente.</small>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <div class="position-relative" style="background: #000; border-radius: 10px; overflow: hidden;">
+              <video id="video-senas" autoplay playsinline style="width: 100%; display: none;"></video>
+              <canvas id="canvas-senas" style="width: 100%; display: block; min-height: 400px; background: #000; position: relative; z-index: 2;"></canvas>
+              <div id="camera-placeholder" class="d-flex align-items-center justify-content-center" style="min-height: 400px; color: #fff; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #000; z-index: 1;">
+                <div class="text-center">
+                  <i class="bi bi-camera-video" style="font-size: 3rem;"></i>
+                  <p class="mt-2">Cámara no iniciada</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-6">
+            <div class="mb-3">
+              <button id="btn-start-camera" class="btn btn-success w-100 mb-2" disabled>
+                <i class="bi bi-camera-video-fill"></i> Iniciar Cámara
+              </button>
+              <button id="btn-stop-camera" class="btn btn-danger w-100 mb-2" disabled>
+                <i class="bi bi-stop-circle-fill"></i> Detener Cámara
+              </button>
+            </div>
+            
+            <div id="detection-status" class="alert alert-info text-center">
+              <i class="bi bi-info-circle"></i> Iniciá la cámara para comenzar
+            </div>
+            
+            <div class="mt-3">
+              <h5 class="fw-bold" style="color: #303481;">Progreso:</h5>
+              <div class="progress mb-2" style="height: 25px;">
+                <div id="progress-bar" class="progress-bar" role="progressbar" 
+                     style="width: 0%; background: linear-gradient(90deg, #471396, #B13BFF);">
+                  <span id="progress-text">0%</span>
+                </div>
+              </div>
+              <p class="small text-muted">Ejercicios completados: <span id="completed-count">0</span> / <span id="total-count">0</span></p>
+            </div>
+            
+            <div class="mt-3">
+              <button id="btn-next-exercise" class="btn btn-morado w-100" disabled>
+                Siguiente Ejercicio
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Contenido de los ejercicios -->
-    <div class="mb-5 p-4 rounded" style="background-color: #D6E6F2;">
-      <h3 class="fw-bold" style="color: #303481;">Practicá mientras con las actividades que se encuentran al final de las lecciones c:</h3>
-      <p>Seleccioná una lección para comenzar a practicar con ejercicios interactivos que te ayudarán a consolidar tus conocimientos.</p>
-      <ul class="list-group list-group-flush">
-        <li class="list-group-item text-center">
-            <p class="fw-bold">Lección 1: Saludos Básicos</p>
-          <a href="{% url 'leccion1' %}" class="btn btn-morado-outline fw-bold">Ejercicios de Lección 1: Saludos Básicos</a>
-        </li>
-        <li class="list-group-item text-center">
-            <p class="fw-bold">Lección 2: Departamentos de El Salvador</p>
-          <a href="{% url 'leccion2' %}" class="btn btn-morado-outline fw-bold">Ejercicios de Lección 2: Departamentos de El Salvador</a>   
-        </li>
-        <li class="list-group-item text-center">
-            <p class="fw-bold">Lección 3: El Abecedario</p>
-          <a href="{% url 'leccion3' %}" class="btn btn-morado-outline fw-bold">Ejercicios de Lección 3: El Abecedario</a>
-        </li>
-        <li class="list-group-item text-center">
-            <p class="fw-bold">Lección 4: Números</p>
-          <a href="{% url 'leccion4' %}" class="btn btn-morado-outline fw-bold">Ejercicios de Lección 4: Números</a>
-      </ul>
-    </div>
   </div>
 </section>
 
- {% endblock %}
+<!-- MediaPipe Hands - Cargar usando scripts UMD -->
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+<!-- Scripts para reconocimiento de señas -->
+<script src="{% static 'js/reconocimiento-senas.js' %}"></script>
+
+<script>
+  // Esperar a que MediaPipe se cargue
+  window.addEventListener('load', () => {
+    if (typeof Camera !== 'undefined' && typeof Hands !== 'undefined') {
+      window.mediaPipeReady = true;
+      console.log('MediaPipe cargado correctamente');
+      window.dispatchEvent(new Event('mediapipe-ready'));
+    } else {
+      // Intentar de nuevo después de un momento
+      setTimeout(() => {
+        if (typeof Camera !== 'undefined' && typeof Hands !== 'undefined') {
+          window.mediaPipeReady = true;
+          console.log('MediaPipe cargado correctamente (retry)');
+          window.dispatchEvent(new Event('mediapipe-ready'));
+        } else {
+          console.error('MediaPipe no se cargó correctamente');
+        }
+      }, 1000);
+    }
+    
+    // Establecer si el usuario es admin
+    if (window.reconocimientoSenas) {
+      window.reconocimientoSenas.isAdmin = {% if user.is_staff %}true{% else %}false{% endif %};
+    }
+  });
+</script>
+
+
+{% endblock %}

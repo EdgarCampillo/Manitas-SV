@@ -27,6 +27,10 @@ urlpatterns = [
     path('leccion4/', views.leccion4, name='leccion4'),
 
     path('ejercicios/', views.ejercicios, name='ejercicios'),
+    path('admin/upload_samples/', views.upload_samples, name='upload_samples'),
+    path('admin/train-signs/', views.admin_train_signs, name='admin_train_signs'),
+    path('api/sign-standards/', views.api_sign_standards, name='api_sign_standards'),
+    path('media/sign-video/<int:standard_id>/', views.serve_sign_video, name='serve_sign_video'),
 
 
     path('recuperar_password/', auth_views.PasswordResetView.as_view(template_name='recuperar_password.html' ),name='password_reset'),

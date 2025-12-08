@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+  .btn-morado {
+    background: linear-gradient(90deg, #471396, #B13BFF);
+    border: none;
+    color: white;
+    font-weight: bold;
+  }
+  .btn-morado:hover {
+    background: linear-gradient(90deg, #5a1ab8, #c14dff);
+    color: white;
+  }
+  .standard-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background: white;
+  }
+  .standard-preview {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 8px;
+    margin-top: 10px;
+  }
+  video.standard-preview {
+    max-width: 300px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="py-5" style="background-color: #F5F5F5;">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h1 class="fw-bold" style="color: #303481;">
+        <i class="bi bi-gear-fill"></i> Entrenamiento de Señas - Admin
+      </h1>
+      <p class="lead">Gestioná los estándares de señas para el reconocimiento</p>
+    </div>
+
+    <!-- Formulario para subir nuevo estándar -->
+    <div class="card shadow-lg mb-4">
+      <div class="card-header bg-primary text-white">
+        <h4 class="mb-0"><i class="bi bi-upload"></i> Subir Nuevo Estándar</h4>
+      </div>
+      <div class="card-body">
+        <form id="upload-standard-form" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="exercise_id" class="form-label">ID del Ejercicio</label>
+              <input type="text" class="form-control" id="exercise_id" name="exercise_id" required
+                     placeholder="Ej: A, NUM_3, DEPT_SAN_MIGUEL, HOLA">
+              <small class="form-text text-muted">ID único del ejercicio</small>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="category" class="form-label">Categoría</label>
+              <select class="form-select" id="category" name="category" required>
+                <option value="">-- Seleccioná --</option>
+                <option value="alfabeto">Alfabeto (solo imágenes)</option>
+                <option value="numeros">Números (solo imágenes)</option>
+                <option value="departamentos">Departamentos (solo videos)</option>
+                <option value="saludos">Saludos Básicos (solo videos)</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="media_file" class="form-label">Archivo</label>
+              <input type="file" class="form-control" id="media_file" name="media_file" required
+                     accept="image/*,video/*">
+              <small class="form-text text-muted" id="file-hint">
+                Seleccioná una imagen o video según la categoría
+              </small>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="description" class="form-label">Descripción (opcional)</label>
+              <textarea class="form-control" id="description" name="description" rows="2"
+                        placeholder="Descripción del estándar"></textarea>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-morado">
+            <i class="bi bi-upload"></i> Subir Estándar
+          </button>
+        </form>
+        <div id="upload-message" class="mt-3"></div>
+      </div>
+    </div>
+
+    <!-- Lista de estándares existentes -->
+    <div class="card shadow-lg">
+      <div class="card-header bg-success text-white">
+        <h4 class="mb-0"><i class="bi bi-list-ul"></i> Estándares Existentes</h4>
+      </div>
+      <div class="card-body">
+        <div id="standards-list">
+          {% for category, standards_list in standards_by_category.items %}
+            <div class="mb-4">
+              <h5 class="fw-bold" style="color: #471396;">
+                {{ category|title }}
+              </h5>
+              <div class="row">
+                {% for standard in standards_list %}
+                  <div class="col-md-6 col-lg-4">
+                    <div class="standard-card">
+                      <h6 class="fw-bold">{{ standard.exercise_id }}</h6>
+                      <p class="small text-muted mb-2">
+                        <span class="badge bg-info">{{ standard.get_media_type_display }}</span>
+                        {% if standard.description %}
+                          <br>{{ standard.description }}
+                        {% endif %}
+                      </p>
+                      {% if standard.media_type == 'image' %}
+                        <img src="{{ standard.media_file.url }}" alt="{{ standard.exercise_id }}" 
+                             class="standard-preview img-fluid">
+                      {% else %}
+                        <video class="standard-preview" controls>
+                          <source src="{% url 'serve_sign_video' standard.id %}" type="video/mp4">
+                          Tu navegador no soporta videos.
+                        </video>
+                      {% endif %}
+                      <div class="mt-2">
+                        <small class="text-muted">
+                          Creado: {{ standard.created_at|date:"d/m/Y H:i" }}
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                {% empty %}
+                  <div class="col-12">
+                    <p class="text-muted">No hay estándares para esta categoría.</p>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          {% empty %}
+            <p class="text-muted text-center">No hay estándares registrados aún.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Botón para ir a ejercicios -->
+    <div class="text-center mt-4">
+      <a href="{% url 'ejercicios' %}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left"></i> Volver a Ejercicios
+      </a>
+      <a href="/admin/manitas/signstandard/" class="btn btn-outline-secondary">
+        <i class="bi bi-gear"></i> Gestionar en Admin Django
+      </a>
+    </div>
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const categorySelect = document.getElementById('category');
+  const mediaFileInput = document.getElementById('media_file');
+  const fileHint = document.getElementById('file-hint');
+  
+  // Actualizar hint según categoría
+  categorySelect.addEventListener('change', function() {
+    const category = this.value;
+    if (category === 'alfabeto' || category === 'numeros') {
+      mediaFileInput.accept = 'image/*';
+      fileHint.textContent = 'Subí una imagen (JPG, PNG, etc.)';
+    } else if (category === 'departamentos' || category === 'saludos') {
+      mediaFileInput.accept = 'video/*';
+      fileHint.textContent = 'Subí un video (MP4, etc.)';
+    } else {
+      mediaFileInput.accept = 'image/*,video/*';
+      fileHint.textContent = 'Seleccioná una imagen o video según la categoría';
+    }
+  });
+
+  // Manejar envío del formulario
+  const form = document.getElementById('upload-standard-form');
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(form);
+    const messageDiv = document.getElementById('upload-message');
+    messageDiv.innerHTML = '<div class="alert alert-info">Subiendo...</div>';
+    
+    try {
+      const response = await fetch('{% url "api_sign_standards" %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        messageDiv.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+        form.reset();
+        // Recargar la página después de 1 segundo
+        setTimeout(() => location.reload(), 1000);
+      } else {
+        messageDiv.innerHTML = `<div class="alert alert-danger">Error: ${data.error}</div>`;
+      }
+    } catch (error) {
+      messageDiv.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+    }
+  });
+});
+</script>
+{% endblock %}
+

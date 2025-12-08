@@ -77,16 +77,40 @@ WSGI_APPLICATION = 'proyecto.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT'),
+# Configuración de base de datos
+# Para desarrollo rápido, usa SQLite
+# Para producción, configura PostgreSQL en un archivo .env
+USE_POSTGRESQL = False  # Cambia a True si quieres usar PostgreSQL
+
+if USE_POSTGRESQL:
+    try:
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': config('DB_NAME'),
+                'USER': config('DB_USER'),
+                'PASSWORD': config('DB_PASSWORD'),
+                'HOST': config('DB_HOST', default='localhost'),
+                'PORT': config('DB_PORT', default='5432'),
+            }
+        }
+    except Exception as e:
+        print(f"Error configurando PostgreSQL: {e}")
+        print("Usando SQLite como respaldo...")
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
+else:
+    # Usar SQLite para desarrollo
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
 
 
 
