@@ -1,22 +1,30 @@
-      UNIVERSIDAD GERARDO BARRIOS
-    FACULTAD DE CIENCIA Y TECNOLOGÍA
-INGENIERIA EN SISTEMAS Y REDES INFORMÁTICAS
+       UNIVERSIDAD GERARDO BARRIOS
       
-       III EXAMEN PARCIAL – C3
+         FACULTAD DE CIENCIA Y TECNOLOGÍA
+     
+     INGENIERIA EN SISTEMAS Y REDES INFORMÁTICAS
+      
+             III EXAMEN PARCIAL – C3
           
-           GRUPO A3
+                 GRUPO A3
            
-            DOCENTE: 
-ING.MONTES GIRÓN, WILLIAN ALEXIS
+                DOCENTE: 
+      ING.MONTES GIRÓN, WILLIAN ALEXIS
 
-            INTEGRANTES:
-BONILLA ARGUETA, FRANCISCA DEL CARMEN
-CAMPILLO ORELLANA, EDGAR ARNOLDO
-MEJIA MEJIA, MADELINE BRUNELLA
-VASQUEZ ALVAREZ, FREDDY SAMUEL
+             
+               INTEGRANTES:
+     BONILLA ARGUETA, FRANCISCA DEL CARMEN
+
+     CAMPILLO ORELLANA, EDGAR ARNOLDO
+
+    MEJIA MEJIA, MADELINE BRUNELLA
 
 
-             Descripcion: 
+      VASQUEZ ALVAREZ, FREDDY SAMUEL
+
+
+                DESCRIPCION: 
+                
 Manitas SV es una plataforma salvadoreña inclusiva que 
 combina videos interactivos, ejercicios prácticos y
 reconocimiento de señas en tiempo real mediante visión artificial.
