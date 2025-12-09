@@ -25,6 +25,9 @@ class ReconocimientoSenas {
         this.trainingLabel = null;
         this.trainingBuffer = [];
         this.trainingFramesToCollect = 12;
+        this.trainingDuration = 30; // 30 segundos para saludos y departamentos
+        this.trainingStartTime = null;
+        this.trainingInterval = null;
         this.knnK = 3;
         this.minSamplesPerSign = 5;
         
@@ -58,45 +61,151 @@ class ReconocimientoSenas {
         if (isImage) {
             const img = new Image();
             img.onload = async () => {
-            await this.hands.send({ image: img });
-            // El resultado se procesa en onResults
-            this.trainingLabel = label;
-            this.trainingCollecting = true;
-            this.trainingBuffer = [];
+                await this.hands.send({ image: img });
+                // El resultado se procesa en onResults
+                this.trainingLabel = label;
+                this.trainingCollecting = true;
+                this.trainingBuffer = [];
             };
             img.src = URL.createObjectURL(file);
         }
 
         if (isVideo) {
+            await this.processVideoForTraining(file, label);
+        }
+    }
+
+    async processVideoForTraining(file, label) {
+        return new Promise((resolve, reject) => {
             const video = document.createElement('video');
             video.src = URL.createObjectURL(file);
             video.muted = true;
-            video.play();
-
-            let frameCount = 0;
+            video.crossOrigin = 'anonymous';
+            video.preload = 'metadata';
+            
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-
-            const captureFrame = async () => {
-            if (frameCount >= this.trainingFramesToCollect) {
-                video.pause();
-                return;
-            }
-
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            await this.hands.send({ image: canvas });
-            this.trainingLabel = label;
-            this.trainingCollecting = true;
-            frameCount++;
-            setTimeout(captureFrame, 300); // cada 300ms
-            };
-
-            video.onloadeddata = () => {
-            captureFrame();
-            };
-        }
+            
+            const targetFrames = this.trainingFramesToCollect;
+            let framesProcessed = 0;
+            
+            video.addEventListener('loadedmetadata', () => {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                
+                const duration = video.duration;
+                if (!duration || isNaN(duration) || duration <= 0) {
+                    console.error('Video no tiene duración válida');
+                    URL.revokeObjectURL(video.src);
+                    reject(new Error('Video inválido'));
+                    return;
+                }
+                
+                const frameInterval = Math.max(0.1, duration / targetFrames);
+                
+                // Configurar para capturar frames
+                this.trainingLabel = label;
+                this.trainingCollecting = true;
+                this.trainingBuffer = [];
+                
+                // Función para capturar un frame en un tiempo específico y esperar a que se procese
+                const captureFrameAtTime = async (time) => {
+                    return new Promise((frameResolve) => {
+                        const seekTime = Math.max(0, Math.min(time, duration - 0.1));
+                        video.currentTime = seekTime;
+                        
+                        const onSeeked = async () => {
+                            video.removeEventListener('seeked', onSeeked);
+                            
+                            // Esperar un momento para que el frame se estabilice
+                            await new Promise(resolve => setTimeout(resolve, 100));
+                            
+                            // Dibujar el frame actual en el canvas
+                            try {
+                                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                                
+                                // Enviar a MediaPipe para procesar y ESPERAR a que termine
+                                try {
+                                    await this.hands.send({ image: canvas });
+                                    // Esperar a que onResults procese el frame antes de continuar
+                                    await new Promise(resolve => setTimeout(resolve, 200));
+                                    framesProcessed++;
+                                    frameResolve();
+                                } catch (err) {
+                                    console.error('Error procesando frame:', err);
+                                    framesProcessed++;
+                                    frameResolve();
+                                }
+                            } catch (err) {
+                                console.error('Error dibujando frame:', err);
+                                framesProcessed++;
+                                frameResolve();
+                            }
+                        };
+                        
+                        const onError = () => {
+                            video.removeEventListener('seeked', onSeeked);
+                            video.removeEventListener('error', onError);
+                            console.error('Error buscando tiempo en video');
+                            framesProcessed++;
+                            frameResolve();
+                        };
+                        
+                        video.addEventListener('seeked', onSeeked, { once: true });
+                        video.addEventListener('error', onError, { once: true });
+                    });
+                };
+                
+                // Capturar frames SECUENCIALMENTE (no en paralelo) para asegurar que cada uno se procese completamente
+                const captureAllFrames = async () => {
+                    try {
+                        // Primero reproducir y pausar para inicializar
+                        await video.play();
+                        video.pause();
+                        
+                        // Esperar un momento
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                        
+                        // Procesar frames uno por uno, esperando a que cada uno termine
+                        for (let i = 0; i < targetFrames; i++) {
+                            const time = (i * frameInterval) + (frameInterval / 2);
+                            await captureFrameAtTime(time);
+                            
+                            // Pequeña pausa entre frames
+                            await new Promise(resolve => setTimeout(resolve, 150));
+                        }
+                        
+                        // Esperar un momento final para que se procesen todas las muestras
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        
+                        video.pause();
+                        URL.revokeObjectURL(video.src);
+                        console.log(`Procesados ${framesProcessed} frames del video para ${label}`);
+                        resolve();
+                    } catch (err) {
+                        console.error('Error en captureAllFrames:', err);
+                        video.pause();
+                        URL.revokeObjectURL(video.src);
+                        reject(err);
+                    }
+                };
+                
+                // Esperar a que el video esté completamente listo
+                if (video.readyState >= 2) {
+                    captureAllFrames();
+                } else {
+                    video.addEventListener('canplaythrough', captureAllFrames, { once: true });
+                }
+            });
+            
+            video.addEventListener('error', (err) => {
+                console.error('Error cargando video:', err);
+                URL.revokeObjectURL(video.src);
+                reject(err);
+            });
+            
+            video.load();
+        });
     }  
     
     generateAlphabetExercises() {
@@ -301,7 +410,29 @@ class ReconocimientoSenas {
             trainingInfo.style.display = 'block';
         }
         
+        // Actualizar la barra de progreso inmediatamente
         this.loadExercise(startIndex);
+        this.updateProgress(); // Forzar actualización inmediata
+    }
+    
+    async waitForMediaPipeReady() {
+        // Esperar a que MediaPipe esté completamente listo
+        if (this.handsReady && this.hands) {
+            return true;
+        }
+        
+        let attempts = 0;
+        const maxAttempts = 50;
+        
+        while (attempts < maxAttempts) {
+            if (this.handsReady && this.hands) {
+                return true;
+            }
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+        }
+        
+        return false;
     }
     
     async loadStandardsForCategory(categoryId) {
@@ -330,10 +461,264 @@ class ReconocimientoSenas {
                         media_files: std.media_files || []  // Incluir todos los archivos
                     };
                 });
+                
+                // Procesamiento automático de videos deshabilitado para evitar bloqueos
+                // Los videos se pueden procesar manualmente desde el panel de admin
+                // if (this.isAdmin) {
+                //     await this.processStandardsVideosForTraining(categoryId);
+                // }
             }
         } catch (error) {
             console.error('Error cargando estándares:', error);
         }
+    }
+    
+    async processStandardsVideosForTraining(categoryId) {
+        // Esperar a que MediaPipe esté listo antes de procesar videos
+        const isReady = await this.waitForMediaPipeReady();
+        if (!isReady) {
+            console.warn('MediaPipe no está listo, no se pueden procesar videos automáticamente');
+            return;
+        }
+        
+        // Verificar que la cámara no esté activa antes de procesar videos
+        if (this.cameraActive) {
+            console.warn('La cámara está activa, no se pueden procesar videos automáticamente');
+            return;
+        }
+        
+        // Procesar videos de estándares automáticamente para entrenamiento
+        const standards = Object.values(this.signStandards).filter(s => s.category === categoryId);
+        
+        // Mostrar mensaje de estado si es admin
+        if (this.isAdmin) {
+            const statusEl = document.getElementById('detection-status');
+            if (statusEl) {
+                statusEl.className = 'alert alert-info text-center';
+                statusEl.innerHTML = '<i class="bi bi-hourglass-split"></i> Procesando videos de estándares para entrenamiento...';
+            }
+        }
+        
+        let processedCount = 0;
+        const processedUrls = new Set(); // Evitar procesar el mismo video múltiples veces
+        
+        for (const standard of standards) {
+            const exerciseId = standard.exercise_id;
+            
+            // Verificar si ya hay muestras para este ejercicio
+            if (this.samples[exerciseId] && this.samples[exerciseId].length >= this.minSamplesPerSign) {
+                console.log(`Ya hay suficientes muestras para ${exerciseId}, saltando...`);
+                continue;
+            }
+            
+            // Buscar videos en los archivos multimedia
+            const videoFiles = (standard.media_files || []).filter(mf => {
+                const url = mf.url || '';
+                return url.match(/\.(mp4|webm|ogg|mov)$/i) || standard.media_type === 'video';
+            });
+            
+            // Si hay videos, procesar el primero
+            if (videoFiles.length > 0 || (standard.media_type === 'video' && standard.media_url)) {
+                try {
+                    const videoUrl = videoFiles[0]?.url || standard.media_url;
+                    if (videoUrl && !processedUrls.has(videoUrl)) {
+                        processedUrls.add(videoUrl);
+                        console.log(`Procesando video estándar para ${exerciseId}...`);
+                        await this.processVideoUrlForTraining(videoUrl, exerciseId);
+                        processedCount++;
+                        
+                        // Pequeña pausa entre videos para no sobrecargar
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                    }
+                } catch (error) {
+                    console.error(`Error procesando video para ${exerciseId}:`, error);
+                    // Continuar con el siguiente video aunque este falle
+                }
+            }
+        }
+        
+        // Actualizar mensaje de estado
+        if (this.isAdmin) {
+            const statusEl = document.getElementById('detection-status');
+            if (statusEl) {
+                if (processedCount > 0) {
+                    statusEl.className = 'alert alert-success text-center';
+                    statusEl.innerHTML = `<i class="bi bi-check-circle"></i> Procesados ${processedCount} videos de estándares. Podés comenzar a entrenar.`;
+                    setTimeout(() => {
+                        if (statusEl && !this.cameraActive) {
+                            statusEl.className = 'alert alert-info text-center';
+                            statusEl.innerHTML = '<i class="bi bi-info-circle"></i> Iniciá la cámara para comenzar';
+                        }
+                    }, 3000);
+                } else {
+                    statusEl.className = 'alert alert-info text-center';
+                    statusEl.innerHTML = '<i class="bi bi-info-circle"></i> No hay videos nuevos para procesar. Iniciá la cámara para comenzar.';
+                }
+            }
+        }
+    }
+    
+    async processVideoUrlForTraining(videoUrl, label) {
+        return new Promise((resolve, reject) => {
+            const video = document.createElement('video');
+            // Construir URL completa si es relativa
+            const fullUrl = videoUrl.startsWith('http') ? videoUrl : window.location.origin + videoUrl;
+            video.src = fullUrl;
+            video.muted = true;
+            video.crossOrigin = 'anonymous';
+            video.preload = 'metadata';
+            
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            const targetFrames = this.trainingFramesToCollect;
+            let framesCaptured = 0;
+            let timeoutId = null;
+            
+            const cleanup = () => {
+                if (timeoutId) clearTimeout(timeoutId);
+                video.pause();
+                video.src = '';
+                video.load();
+            };
+            
+            // Timeout de seguridad
+            timeoutId = setTimeout(() => {
+                console.warn(`Timeout procesando video para ${label}`);
+                cleanup();
+                resolve(); // Resolver en lugar de rechazar para no bloquear otros videos
+            }, 60000); // 60 segundos máximo para videos más largos
+            
+            video.addEventListener('loadedmetadata', () => {
+                if (!video.videoWidth || !video.videoHeight) {
+                    console.warn(`Video ${label} no tiene dimensiones válidas`);
+                    cleanup();
+                    resolve();
+                    return;
+                }
+                
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                
+                const duration = video.duration;
+                if (!duration || isNaN(duration) || duration <= 0) {
+                    console.warn(`Video ${label} no tiene duración válida`);
+                    cleanup();
+                    resolve();
+                    return;
+                }
+                
+                const frameInterval = Math.max(0.1, duration / targetFrames);
+                
+                // Configurar para capturar frames
+                this.trainingLabel = label;
+                this.trainingCollecting = true;
+                this.trainingBuffer = [];
+                
+                // Función para capturar un frame en un tiempo específico y esperar a que se procese
+                const captureFrameAtTime = async (time) => {
+                    return new Promise((frameResolve) => {
+                        const seekTime = Math.max(0, Math.min(time, duration - 0.1));
+                        video.currentTime = seekTime;
+                        
+                        const onSeeked = async () => {
+                            video.removeEventListener('seeked', onSeeked);
+                            
+                            // Esperar un momento para que el frame se estabilice
+                            await new Promise(resolve => setTimeout(resolve, 100));
+                            
+                            // Dibujar el frame actual en el canvas
+                            try {
+                                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                                
+                                // Enviar a MediaPipe para procesar y ESPERAR a que termine
+                                try {
+                                    await this.hands.send({ image: canvas });
+                                    // Esperar a que onResults procese el frame antes de continuar
+                                    await new Promise(resolve => setTimeout(resolve, 200));
+                                    framesCaptured++;
+                                    frameResolve();
+                                } catch (err) {
+                                    console.error('Error procesando frame:', err);
+                                    framesCaptured++;
+                                    frameResolve();
+                                }
+                            } catch (err) {
+                                console.error('Error dibujando frame:', err);
+                                framesCaptured++;
+                                frameResolve();
+                            }
+                        };
+                        
+                        const onError = () => {
+                            video.removeEventListener('seeked', onSeeked);
+                            video.removeEventListener('error', onError);
+                            console.error('Error buscando tiempo en video');
+                            framesCaptured++;
+                            frameResolve();
+                        };
+                        
+                        video.addEventListener('seeked', onSeeked, { once: true });
+                        video.addEventListener('error', onError, { once: true });
+                    });
+                };
+                
+                // Capturar frames SECUENCIALMENTE (no en paralelo) para asegurar que cada uno se procese completamente
+                const captureAllFrames = async () => {
+                    try {
+                        // Primero reproducir y pausar para inicializar
+                        await video.play();
+                        video.pause();
+                        
+                        // Esperar un momento
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                        
+                        // Procesar frames uno por uno, esperando a que cada uno termine
+                        for (let i = 0; i < targetFrames; i++) {
+                            const time = (i * frameInterval) + (frameInterval / 2);
+                            await captureFrameAtTime(time);
+                            
+                            // Pequeña pausa entre frames
+                            await new Promise(resolve => setTimeout(resolve, 150));
+                        }
+                        
+                        // Esperar un momento final para que se procesen todas las muestras
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        
+                        if (timeoutId) clearTimeout(timeoutId);
+                        cleanup();
+                        
+                        console.log(`Procesados ${framesCaptured} frames del video estándar para ${label}`);
+                        resolve();
+                    } catch (err) {
+                        console.error('Error en captureAllFrames:', err);
+                        if (timeoutId) clearTimeout(timeoutId);
+                        cleanup();
+                        resolve(); // Resolver en lugar de rechazar
+                    }
+                };
+                
+                // Esperar a que el video esté completamente listo
+                if (video.readyState >= 2) {
+                    captureAllFrames();
+                } else {
+                    video.addEventListener('canplaythrough', captureAllFrames, { once: true });
+                }
+            });
+            
+            video.addEventListener('error', (err) => {
+                // Solo mostrar el error una vez, no en bucle
+                if (!video.dataset.errorLogged) {
+                    console.error('Error cargando video desde URL:', fullUrl);
+                    video.dataset.errorLogged = 'true';
+                }
+                if (timeoutId) clearTimeout(timeoutId);
+                cleanup();
+                resolve(); // Resolver en lugar de rechazar para no bloquear otros videos
+            });
+            
+            video.load();
+        });
     }
 
     loadExercise(index) {
@@ -408,11 +793,20 @@ class ReconocimientoSenas {
                 placeholder.style.display = 'none';
             }
             
+            // Asegurar que el canvas sea visible
             if (this.canvas) {
                 this.canvas.style.display = 'block';
                 this.canvas.style.visibility = 'visible';
+                this.canvas.style.position = 'relative';
+                this.canvas.style.zIndex = '2';
+                // Inicializar con fondo negro si no hay video aún
+                if (this.ctx) {
+                    this.ctx.fillStyle = '#000000';
+                    this.ctx.fillRect(0, 0, this.canvas.width || 640, this.canvas.height || 480);
+                }
             }
             
+            // Detener cualquier stream anterior
             if (this.video.srcObject) {
                 this.video.srcObject.getTracks().forEach(track => track.stop());
                 this.video.srcObject = null;
@@ -428,9 +822,21 @@ class ReconocimientoSenas {
                 
                 const onLoadedMetadata = () => {
                     clearTimeout(timeout);
-                    this.canvas.width = this.video.videoWidth || 640;
-                    this.canvas.height = this.video.videoHeight || 480;
+                    const videoWidth = this.video.videoWidth || 640;
+                    const videoHeight = this.video.videoHeight || 480;
+                    this.canvas.width = videoWidth;
+                    this.canvas.height = videoHeight;
                     console.log('Canvas configurado con dimensiones:', this.canvas.width, 'x', this.canvas.height);
+                    
+                    // Asegurar que el canvas sea visible
+                    this.canvas.style.display = 'block';
+                    this.canvas.style.visibility = 'visible';
+                    
+                    // Dibujar el primer frame inmediatamente
+                    if (this.ctx && this.video.readyState >= 2) {
+                        this.ctx.drawImage(this.video, 0, 0, videoWidth, videoHeight);
+                    }
+                    
                     this.video.removeEventListener('loadedmetadata', onLoadedMetadata);
                     this.video.removeEventListener('error', onError);
                     resolve();
@@ -629,24 +1035,49 @@ class ReconocimientoSenas {
             // Entrenamiento: capturar features
             if (this.trainingCollecting && this.trainingLabel) {
                 const feat = this.extractFeatures(landmarks);
-                this.trainingBuffer.push(feat);
-                if (this.trainingBuffer.length >= this.trainingFramesToCollect) {
-                    const avg = this.averageFeatureBuffer(this.trainingBuffer);
-                    this.addSample(this.trainingLabel, avg);
-                    this.trainingCollecting = false;
-                    this.trainingBuffer = [];
+                
+                // Determinar el modo de entrenamiento según la categoría
+                const isTimeBasedCategory = this.currentCategory === 'saludos' || this.currentCategory === 'departamentos';
+                
+                if (isTimeBasedCategory) {
+                    // Para saludos y departamentos: usar tiempo (30 segundos)
+                    this.trainingBuffer.push(feat);
+                    const elapsed = (Date.now() - this.trainingStartTime) / 1000;
+                    const remaining = Math.max(0, this.trainingDuration - elapsed);
+                    
                     const statusEl = document.getElementById('detection-status');
                     if (statusEl && this.isAdmin) {
-                        // Solo mostrar mensaje de muestra guardada para admins
-                        statusEl.className = 'alert alert-success text-center';
-                        statusEl.innerHTML = `<i class="bi bi-check-circle-fill"></i> Muestra guardada para ${this.trainingLabel} (solo visible para admin)`;
+                        statusEl.className = 'alert alert-info text-center';
+                        statusEl.innerHTML = `<i class="bi bi-hourglass-split"></i> Grabando... ${Math.ceil(remaining)}s restantes para ${this.trainingLabel}`;
+                    }
+                    
+                    if (remaining <= 0) {
+                        // Tiempo completado: guardar todas las muestras
+                        this.trainingBuffer.forEach(sample => {
+                            this.addSample(this.trainingLabel, sample);
+                        });
+                        const sampleCount = this.trainingBuffer.length;
+                        this.trainingCollecting = false;
+                        this.trainingBuffer = [];
+                        this.trainingStartTime = null;
+                        if (this.trainingInterval) {
+                            clearInterval(this.trainingInterval);
+                            this.trainingInterval = null;
+                        }
+                        const statusEl = document.getElementById('detection-status');
+                        if (statusEl && this.isAdmin) {
+                            statusEl.className = 'alert alert-success text-center';
+                            statusEl.innerHTML = `<i class="bi bi-check-circle-fill"></i> Muestra guardada para ${this.trainingLabel} (${sampleCount} frames capturados)`;
+                        }
                     }
                 } else {
+                    // Para alfabeto y números: sin frames, guardar muestra directa
+                    this.addSample(this.trainingLabel, feat);
+                    this.trainingCollecting = false;
                     const statusEl = document.getElementById('detection-status');
                     if (statusEl && this.isAdmin) {
-                        // Solo mostrar progreso de recolección para admins
-                        statusEl.className = 'alert alert-info text-center';
-                        statusEl.innerHTML = `<i class="bi bi-hourglass-split"></i> Recolectando muestra ${this.trainingBuffer.length}/${this.trainingFramesToCollect} para ${this.trainingLabel}`;
+                        statusEl.className = 'alert alert-success text-center';
+                        statusEl.innerHTML = `<i class="bi bi-check-circle-fill"></i> Muestra guardada para ${this.trainingLabel}`;
                     }
                 }
             }
@@ -863,6 +1294,9 @@ class ReconocimientoSenas {
         
         try {
             const progressKey = `manitas_exercise_progress_${this.currentCategory}`;
+            const completedKey = `manitas_category_completed_${this.currentCategory}`;
+            
+            // Guardar progreso actual
             const progressData = {
                 category: this.currentCategory,
                 exerciseIndex: this.currentExerciseIndex,
@@ -870,6 +1304,11 @@ class ReconocimientoSenas {
                 timestamp: Date.now()
             };
             localStorage.setItem(progressKey, JSON.stringify(progressData));
+            
+            // Si la categoría está completada, marcarla como tal
+            if (this.currentExerciseIndex >= this.exercises.length) {
+                localStorage.setItem(completedKey, 'true');
+            }
         } catch (e) {
             console.error('Error guardando progreso:', e);
         }
@@ -878,14 +1317,23 @@ class ReconocimientoSenas {
     loadProgress(categoryId) {
         try {
             const progressKey = `manitas_exercise_progress_${categoryId}`;
+            const completedKey = `manitas_category_completed_${categoryId}`;
             const saved = localStorage.getItem(progressKey);
+            const isCompleted = localStorage.getItem(completedKey) === 'true';
+            
             if (saved) {
                 const progressData = JSON.parse(saved);
                 // Verificar que la categoría coincida y que el índice sea válido
                 if (progressData.category === categoryId && 
-                    progressData.exerciseIndex >= 0 && 
-                    progressData.exerciseIndex < this.categories[categoryId].exercises.length) {
-                    return progressData.exerciseIndex;
+                    progressData.exerciseIndex >= 0) {
+                    // Si está completada, mantener el último índice
+                    if (isCompleted && progressData.exerciseIndex >= this.categories[categoryId].exercises.length) {
+                        return this.categories[categoryId].exercises.length - 1; // Mantener en el último ejercicio
+                    }
+                    // Si no está completada pero el índice es válido, usarlo
+                    if (progressData.exerciseIndex < this.categories[categoryId].exercises.length) {
+                        return progressData.exerciseIndex;
+                    }
                 }
             }
         } catch (e) {
@@ -900,6 +1348,16 @@ class ReconocimientoSenas {
         const progress = (completed / total) * 100;
         const progressBar = document.getElementById('progress-bar');
         const progressText = document.getElementById('progress-text');
+        const completedCountEl = document.getElementById('completed-count');
+        const totalCountEl = document.getElementById('total-count');
+        
+        // Actualizar contadores
+        if (completedCountEl) {
+            completedCountEl.textContent = completed;
+        }
+        if (totalCountEl) {
+            totalCountEl.textContent = total;
+        }
         
         if (progressBar) {
             progressBar.style.width = progress + '%';
@@ -914,18 +1372,74 @@ class ReconocimientoSenas {
     }
 
     showCompletion() {
+        const categoryName = this.currentCategory ? this.categories[this.currentCategory]?.name || this.currentCategory : 'la categoría';
+        
         document.getElementById('exercise-info').innerHTML = `
             <div class="text-center">
+                <div class="mb-4">
+                    <i class="bi bi-check-circle-fill" style="font-size: 4rem; color: #28a745;"></i>
+                </div>
                 <h3 class="fw-bold" style="color: #471396;">🎉 ¡Felicitaciones!</h3>
-                <p class="lead">Completaste todos los ejercicios de reconocimiento de señas</p>
-                <button class="btn btn-morado btn-lg mt-3" onclick="location.reload()">
-                    Reiniciar Ejercicios
-                </button>
+                <p class="lead">Completaste todos los ejercicios de <strong>${categoryName}</strong></p>
+                <div class="mt-4">
+                    <button class="btn btn-morado btn-lg me-2" onclick="window.reconocimientoSenas.restartCategory()">
+                        <i class="bi bi-arrow-clockwise"></i> Reiniciar Categoría
+                    </button>
+                    <button class="btn btn-outline-secondary btn-lg" onclick="document.getElementById('category-select').value = ''; document.getElementById('category-select').dispatchEvent(new Event('change'));">
+                        <i class="bi bi-list"></i> Cambiar Categoría
+                    </button>
+                </div>
             </div>
         `;
         
         document.getElementById('detection-status').className = 'alert alert-success text-center';
-        document.getElementById('detection-status').innerHTML = '<i class="bi bi-trophy-fill"></i> ¡Todos los ejercicios completados!';
+        document.getElementById('detection-status').innerHTML = '<i class="bi bi-trophy-fill"></i> ¡Categoría completada!';
+        
+        // Actualizar barra de progreso al 100%
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        if (progressBar) {
+            progressBar.style.width = '100%';
+            progressBar.setAttribute('aria-valuenow', 100);
+        }
+        if (progressText) {
+            progressText.textContent = '100%';
+        }
+        
+        // Deshabilitar botones de navegación
+        const btnNext = document.getElementById('btn-next-exercise');
+        const btnPrev = document.getElementById('btn-prev-exercise');
+        if (btnNext) btnNext.disabled = true;
+        if (btnPrev) btnPrev.disabled = true;
+    }
+    
+    restartCategory() {
+        if (!this.currentCategory) return;
+        
+        // Limpiar progreso guardado pero mantener el estado de completado
+        try {
+            const progressKey = `manitas_exercise_progress_${this.currentCategory}`;
+            const completedKey = `manitas_category_completed_${this.currentCategory}`;
+            localStorage.removeItem(progressKey);
+            localStorage.removeItem(completedKey); // También limpiar el estado de completado
+        } catch (e) {
+            console.error('Error limpiando progreso:', e);
+        }
+        
+        // Reiniciar al primer ejercicio
+        this.currentExerciseIndex = 0;
+        this.lastDetection = null;
+        this.lastCorrectDetection = false;
+        
+        // Recargar ejercicio
+        this.loadExercise(0);
+        
+        // Resetear estado
+        const statusEl = document.getElementById('detection-status');
+        if (statusEl) {
+            statusEl.className = 'alert alert-info text-center';
+            statusEl.innerHTML = '<i class="bi bi-info-circle"></i> Categoría reiniciada. Iniciá la cámara para comenzar.';
+        }
     }
 
     playSuccessSound() {
@@ -1133,10 +1647,57 @@ class ReconocimientoSenas {
         list.innerHTML = '';
         this.exercises.forEach(ex => {
             const cnt = (this.samples[ex.id] || []).length;
-            const li = document.createElement('div');
-            li.textContent = `${ex.id}: ${cnt} muestras`;
-            list.appendChild(li);
+            const item = document.createElement('div');
+            item.style.display = 'flex';
+            item.style.justifyContent = 'space-between';
+            item.style.alignItems = 'center';
+            item.style.marginBottom = '4px';
+            item.style.padding = '4px';
+            item.style.borderBottom = '1px solid #eee';
+            
+            const label = document.createElement('span');
+            label.textContent = `${ex.id}: ${cnt} muestras`;
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = '🗑️';
+            deleteBtn.className = 'btn btn-sm btn-outline-danger';
+            deleteBtn.style.padding = '2px 6px';
+            deleteBtn.style.fontSize = '12px';
+            deleteBtn.title = 'Borrar todas las muestras de ' + ex.id;
+            deleteBtn.addEventListener('click', () => {
+                if (confirm(`¿Estás seguro de borrar todas las muestras de ${ex.id}?`)) {
+                    this.deleteSamples(ex.id);
+                }
+            });
+            
+            item.appendChild(label);
+            if (cnt > 0) {
+                item.appendChild(deleteBtn);
+            }
+            list.appendChild(item);
         });
+    }
+    
+    deleteSamples(label) {
+        if (this.samples[label]) {
+            delete this.samples[label];
+            this.persistSamples();
+            this.updateAdminPanelCounts();
+            console.log(`Muestras de ${label} eliminadas`);
+            
+            // Mostrar mensaje de confirmación
+            const statusEl = document.getElementById('detection-status');
+            if (statusEl) {
+                statusEl.className = 'alert alert-success text-center';
+                statusEl.innerHTML = `<i class="bi bi-check-circle"></i> Muestras de ${label} eliminadas`;
+                setTimeout(() => {
+                    if (statusEl && !this.cameraActive) {
+                        statusEl.className = 'alert alert-info text-center';
+                        statusEl.innerHTML = '<i class="bi bi-info-circle"></i> Iniciá la cámara para comenzar';
+                    }
+                }, 2000);
+            }
+        }
     }
 
     toggleAdminPanel() {
@@ -1184,7 +1745,8 @@ class ReconocimientoSenas {
         panel.appendChild(input);
 
         const btnRecord = document.createElement('button');
-        btnRecord.textContent = 'Grabar muestra (12 frames)';
+        const isTimeBased = this.currentCategory === 'saludos' || this.currentCategory === 'departamentos';
+        btnRecord.textContent = isTimeBased ? 'Grabar muestra (15s)' : 'Grabar muestra';
         btnRecord.style.width = '100%';
         btnRecord.style.marginTop = '8px';
         btnRecord.className = 'btn btn-sm btn-primary';
@@ -1197,6 +1759,16 @@ class ReconocimientoSenas {
             this.trainingLabel = label;
             this.trainingCollecting = true;
             this.trainingBuffer = [];
+            
+            if (isTimeBased) {
+                // Iniciar temporizador de 15 segundos
+                this.trainingStartTime = Date.now();
+                const statusEl = document.getElementById('detection-status');
+                if (statusEl) {
+                    statusEl.className = 'alert alert-info text-center';
+                    statusEl.innerHTML = `<i class="bi bi-hourglass-split"></i> Grabando... 15s restantes para ${label}`;
+                }
+            }
         });
         panel.appendChild(btnRecord);
 
