@@ -29,6 +29,17 @@
   video.standard-preview {
     max-width: 300px;
   }
+  .media-files-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .file-input-group {
+    background-color: #f8f9fa;
+  }
+  .file-input-group:hover {
+    background-color: #e9ecef;
+  }
 </style>
 {% endblock %}
 
@@ -52,13 +63,13 @@
           {% csrf_token %}
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label for="exercise_id" class="form-label">ID del Ejercicio</label>
+              <label for="exercise_id" class="form-label">ID del Ejercicio *</label>
               <input type="text" class="form-control" id="exercise_id" name="exercise_id" required
                      placeholder="Ej: A, NUM_3, DEPT_SAN_MIGUEL, HOLA">
               <small class="form-text text-muted">ID único del ejercicio</small>
             </div>
             <div class="col-md-6 mb-3">
-              <label for="category" class="form-label">Categoría</label>
+              <label for="category" class="form-label">Categoría *</label>
               <select class="form-select" id="category" name="category" required>
                 <option value="">-- Seleccioná --</option>
                 <option value="alfabeto">Alfabeto (solo imágenes)</option>
@@ -68,21 +79,97 @@
               </select>
             </div>
           </div>
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="media_file" class="form-label">Archivo</label>
-              <input type="file" class="form-control" id="media_file" name="media_file" required
-                     accept="image/*,video/*">
-              <small class="form-text text-muted" id="file-hint">
-                Seleccioná una imagen o video según la categoría
-              </small>
+          
+          <!-- Archivos múltiples (1-3) -->
+          <div class="mb-3">
+            <label class="form-label">Archivos (1-3 archivos) *</label>
+            <div id="files-container">
+              <!-- Archivo 1 -->
+              <div class="file-input-group mb-3 p-3 border rounded">
+                <div class="row">
+                  <div class="col-md-6 mb-2">
+                    <label class="form-label small">Archivo 1</label>
+                    <input type="file" class="form-control media-file-input" name="media_files[]" 
+                           accept="image/*,video/*" required>
+                  </div>
+                  <div class="col-md-3 mb-2">
+                    <label class="form-label small">Mano</label>
+                    <select class="form-select form-select-sm hand-select" name="hand_preference_0">
+                      <option value="ambas">Ambas</option>
+                      <option value="izquierda">Izquierda</option>
+                      <option value="derecha">Derecha</option>
+                    </select>
+                  </div>
+                  <div class="col-md-3 mb-2">
+                    <label class="form-label small">Variante (opcional)</label>
+                    <input type="text" class="form-control form-control-sm" name="variant_description_0"
+                           placeholder="Ej: Vista frontal">
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Archivo 2 (opcional) -->
+              <div class="file-input-group mb-3 p-3 border rounded" id="file-2-group" style="display: none;">
+                <div class="row">
+                  <div class="col-md-6 mb-2">
+                    <label class="form-label small">Archivo 2 (opcional)</label>
+                    <input type="file" class="form-control media-file-input" name="media_files[]" 
+                           accept="image/*,video/*">
+                  </div>
+                  <div class="col-md-3 mb-2">
+                    <label class="form-label small">Mano</label>
+                    <select class="form-select form-select-sm hand-select" name="hand_preference_1">
+                      <option value="ambas">Ambas</option>
+                      <option value="izquierda">Izquierda</option>
+                      <option value="derecha">Derecha</option>
+                    </select>
+                  </div>
+                  <div class="col-md-3 mb-2">
+                    <label class="form-label small">Variante (opcional)</label>
+                    <input type="text" class="form-control form-control-sm" name="variant_description_1"
+                           placeholder="Ej: Vista lateral">
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Archivo 3 (opcional) -->
+              <div class="file-input-group mb-3 p-3 border rounded" id="file-3-group" style="display: none;">
+                <div class="row">
+                  <div class="col-md-6 mb-2">
+                    <label class="form-label small">Archivo 3 (opcional)</label>
+                    <input type="file" class="form-control media-file-input" name="media_files[]" 
+                           accept="image/*,video/*">
+                  </div>
+                  <div class="col-md-3 mb-2">
+                    <label class="form-label small">Mano</label>
+                    <select class="form-select form-select-sm hand-select" name="hand_preference_2">
+                      <option value="ambas">Ambas</option>
+                      <option value="izquierda">Izquierda</option>
+                      <option value="derecha">Derecha</option>
+                    </select>
+                  </div>
+                  <div class="col-md-3 mb-2">
+                    <label class="form-label small">Variante (opcional)</label>
+                    <input type="text" class="form-control form-control-sm" name="variant_description_2"
+                           placeholder="Ej: Ángulo diferente">
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="col-md-6 mb-3">
-              <label for="description" class="form-label">Descripción (opcional)</label>
-              <textarea class="form-control" id="description" name="description" rows="2"
-                        placeholder="Descripción del estándar"></textarea>
-            </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="add-file-btn">
+              <i class="bi bi-plus-circle"></i> Agregar otro archivo
+            </button>
+            <small class="form-text text-muted d-block mt-2" id="file-hint">
+              Podés subir entre 1 y 3 archivos. Todos deben ser del mismo tipo (imágenes o videos).
+            </small>
           </div>
+          
+          <div class="mb-3">
+            <label for="description" class="form-label">Descripción del estándar (opcional)</label>
+            <textarea class="form-control" id="description" name="description" rows="2"
+                      placeholder="Descripción general del estándar"></textarea>
+          </div>
+          
           <button type="submit" class="btn btn-morado">
             <i class="bi bi-upload"></i> Subir Estándar
           </button>
@@ -114,14 +201,40 @@
                           <br>{{ standard.description }}
                         {% endif %}
                       </p>
-                      {% if standard.media_type == 'image' %}
-                        <img src="{{ standard.media_file.url }}" alt="{{ standard.exercise_id }}" 
-                             class="standard-preview img-fluid">
-                      {% else %}
-                        <video class="standard-preview" controls>
-                          <source src="{% url 'serve_sign_video' standard.id %}" type="video/mp4">
-                          Tu navegador no soporta videos.
-                        </video>
+                      {% if standard.get_media_files %}
+                        <!-- Mostrar múltiples archivos -->
+                        <div class="media-files-container">
+                          {% for media_file in standard.get_media_files %}
+                            <div class="mb-2">
+                              {% if standard.media_type == 'image' %}
+                                <img src="{{ media_file.media_file.url }}" alt="{{ standard.exercise_id }}" 
+                                     class="standard-preview img-fluid">
+                              {% else %}
+                                <video class="standard-preview" controls>
+                                  <source src="{{ media_file.media_file.url }}" type="video/mp4">
+                                  Tu navegador no soporta videos.
+                                </video>
+                              {% endif %}
+                              <small class="d-block text-muted">
+                                <i class="bi bi-hand-index"></i> {{ media_file.get_hand_preference_display }}
+                                {% if media_file.variant_description %}
+                                  - {{ media_file.variant_description }}
+                                {% endif %}
+                              </small>
+                            </div>
+                          {% endfor %}
+                        </div>
+                      {% elif standard.media_file %}
+                        <!-- Compatibilidad con archivo legacy -->
+                        {% if standard.media_type == 'image' %}
+                          <img src="{{ standard.media_file.url }}" alt="{{ standard.exercise_id }}" 
+                               class="standard-preview img-fluid">
+                        {% else %}
+                          <video class="standard-preview" controls>
+                            <source src="{% url 'serve_sign_video' standard.id %}" type="video/mp4">
+                            Tu navegador no soporta videos.
+                          </video>
+                        {% endif %}
                       {% endif %}
                       <div class="mt-2">
                         <small class="text-muted">
@@ -159,21 +272,37 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const categorySelect = document.getElementById('category');
-  const mediaFileInput = document.getElementById('media_file');
   const fileHint = document.getElementById('file-hint');
+  const addFileBtn = document.getElementById('add-file-btn');
+  let visibleFiles = 1;
   
-  // Actualizar hint según categoría
+  // Actualizar hint según categoría y restricciones de archivos
   categorySelect.addEventListener('change', function() {
     const category = this.value;
+    const fileInputs = document.querySelectorAll('.media-file-input');
+    
     if (category === 'alfabeto' || category === 'numeros') {
-      mediaFileInput.accept = 'image/*';
-      fileHint.textContent = 'Subí una imagen (JPG, PNG, etc.)';
+      fileInputs.forEach(input => input.accept = 'image/*');
+      fileHint.textContent = 'Podés subir entre 1 y 3 imágenes. Todos deben ser del mismo tipo.';
     } else if (category === 'departamentos' || category === 'saludos') {
-      mediaFileInput.accept = 'video/*';
-      fileHint.textContent = 'Subí un video (MP4, etc.)';
+      fileInputs.forEach(input => input.accept = 'video/*');
+      fileHint.textContent = 'Podés subir entre 1 y 3 videos. Todos deben ser del mismo tipo.';
     } else {
-      mediaFileInput.accept = 'image/*,video/*';
-      fileHint.textContent = 'Seleccioná una imagen o video según la categoría';
+      fileInputs.forEach(input => input.accept = 'image/*,video/*');
+      fileHint.textContent = 'Podés subir entre 1 y 3 archivos. Todos deben ser del mismo tipo (imágenes o videos).';
+    }
+  });
+
+  // Botón para agregar más archivos
+  addFileBtn.addEventListener('click', function() {
+    if (visibleFiles < 3) {
+      visibleFiles++;
+      if (visibleFiles === 2) {
+        document.getElementById('file-2-group').style.display = 'block';
+      } else if (visibleFiles === 3) {
+        document.getElementById('file-3-group').style.display = 'block';
+        addFileBtn.style.display = 'none';
+      }
     }
   });
 
@@ -185,6 +314,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const formData = new FormData(form);
     const messageDiv = document.getElementById('upload-message');
     messageDiv.innerHTML = '<div class="alert alert-info">Subiendo...</div>';
+    
+    // Validar que al menos un archivo esté seleccionado
+    const fileInputs = document.querySelectorAll('.media-file-input');
+    let hasFile = false;
+    fileInputs.forEach(input => {
+      if (input.files && input.files.length > 0) {
+        hasFile = true;
+      }
+    });
+    
+    if (!hasFile) {
+      messageDiv.innerHTML = '<div class="alert alert-danger">Debes seleccionar al menos un archivo</div>';
+      return;
+    }
     
     try {
       const response = await fetch('{% url "api_sign_standards" %}', {
@@ -200,8 +343,13 @@ document.addEventListener('DOMContentLoaded', function() {
       if (response.ok) {
         messageDiv.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
         form.reset();
-        // Recargar la página después de 1 segundo
-        setTimeout(() => location.reload(), 1000);
+        // Resetear visibilidad de archivos
+        visibleFiles = 1;
+        document.getElementById('file-2-group').style.display = 'none';
+        document.getElementById('file-3-group').style.display = 'none';
+        addFileBtn.style.display = 'inline-block';
+        // Recargar la página después de 1.5 segundos
+        setTimeout(() => location.reload(), 1500);
       } else {
         messageDiv.innerHTML = `<div class="alert alert-danger">Error: ${data.error}</div>`;
       }

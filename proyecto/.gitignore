@@ -1,34 +1,52 @@
 # Entorno virtual
 venv/
 env/
+entorno/
+.../entorno/
 
 # Base de datos local
 db.sqlite3
+*.db
+*.sqlite
+*.sqlite3
 
-# Configuración sensible
+# Configuración sensible - NUNCA subir al repositorio
 .env
+.env.local
+.env.*.local
+CREDENCIALES_COMPARTIDAS.md
 
 # Archivos compilados de Python
 *.pyc
 __pycache__/
-
-
-
+*.py[cod]
+*$py.class
+*.so
 
 # Archivos estáticos generados
 staticfiles/
+collectstatic/
+
+# Archivos de medios (opcional, descomenta si no quieres subir imágenes)
+# media/
 
 # Archivos temporales del sistema operativo
 .DS_Store
 Thumbs.db
+*.swp
+*.swo
+*~
 
-# Configuración de VSCode
+# Configuración de IDEs
 .vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
 
-__pycache__/
-*.pyc
-db.sqlite3
-.env
-entorno/
-venv/
-.../entorno/
+# Logs
+*.log
+logs/
+
+# Archivos de backup
+*.bak
+*.backup

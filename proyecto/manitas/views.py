@@ -6,7 +6,7 @@ from django.contrib import messages
 from social_django.models import UserSocialAuth
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import PerfilForm
-from .models import Perfil, SignStandard
+from .models import Perfil, SignStandard, SignStandardMedia
 from django.http import JsonResponse, HttpResponseForbidden, HttpResponseBadRequest, FileResponse, Http404
 from django.conf import settings
 from django.views.decorators.http import require_http_methods
@@ -99,14 +99,28 @@ def registrate_google(request):
 def perfil_view(request):
     user = request.user
     perfil, created = Perfil.objects.get_or_create(user=user)
+    
+    # Si el perfil fue recién creado y no tiene imagen, establecer la imagen por defecto
+    if created and not perfil.image:
+        perfil.image = 'img/perfil.png'
+        perfil.save()
 
     if request.method == 'POST':
         form = PerfilForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             form.save()
+            # Asegurar que si no hay imagen, usar la por defecto
+            perfil.refresh_from_db()
+            if not perfil.image:
+                perfil.image = 'img/perfil.png'
+                perfil.save()
             return redirect('perfil')
     else:
         form = PerfilForm(instance=user)
+        # Asegurar que si no hay imagen, usar la por defecto
+        if not perfil.image:
+            perfil.image = 'img/perfil.png'
+            perfil.save()
 
     return render(request, 'perfil.html', {'form': form, 'perfil': perfil})
 
@@ -215,17 +229,41 @@ def api_sign_standards(request):
         if not request.user.is_staff:
             filters['media_type'] = 'image'
         
-        standards = SignStandard.objects.filter(**filters)
+        standards = SignStandard.objects.filter(**filters).prefetch_related('media_files')
         
         data = []
         for std in standards:
+            # Obtener todos los archivos multimedia asociados
+            media_files = []
+            for media_file in std.get_media_files():
+                media_files.append({
+                    'id': media_file.id,
+                    'url': media_file.media_file.url,
+                    'hand_preference': media_file.hand_preference,
+                    'hand_preference_display': media_file.get_hand_preference_display(),
+                    'variant_description': media_file.variant_description,
+                    'order': media_file.order
+                })
+            
+            # Si no hay archivos múltiples, usar el archivo legacy si existe
+            if not media_files and std.media_file:
+                media_files.append({
+                    'id': None,
+                    'url': std.media_file.url,
+                    'hand_preference': 'ambas',
+                    'hand_preference_display': 'Ambas',
+                    'variant_description': '',
+                    'order': 0
+                })
+            
             data.append({
                 'id': std.id,
                 'exercise_id': std.exercise_id,
                 'category': std.category,
                 'media_type': std.media_type,
-                'media_url': std.media_file.url if std.media_file else None,
-                'description': std.description
+                'media_url': std.media_file.url if std.media_file and not media_files else None,
+                'description': std.description,
+                'media_files': media_files  # Incluir todos los archivos
             })
         
         return JsonResponse({'standards': data})
@@ -236,14 +274,36 @@ def api_sign_standards(request):
             return HttpResponseForbidden('Acceso denegado')
         
         try:
-            exercise_id = request.POST.get('exercise_id')
-            category = request.POST.get('category')
-            media_type = request.POST.get('media_type')
-            description = request.POST.get('description', '')
-            media_file = request.FILES.get('media_file')
+            exercise_id = request.POST.get('exercise_id', '').strip()
+            category = request.POST.get('category', '').strip()
+            description = request.POST.get('description', '').strip()
             
-            if not all([exercise_id, category, media_type, media_file]):
-                return JsonResponse({'error': 'Faltan campos requeridos'}, status=400)
+            # Validar campos básicos
+            if not exercise_id or not category:
+                return JsonResponse({'error': 'Faltan campos requeridos: ID del Ejercicio y Categoría'}, status=400)
+            
+            # Obtener archivos múltiples
+            media_files = request.FILES.getlist('media_files[]')
+            if not media_files:
+                return JsonResponse({'error': 'Debes subir al menos un archivo'}, status=400)
+            
+            if len(media_files) > 3:
+                return JsonResponse({'error': 'Máximo 3 archivos por estándar'}, status=400)
+            
+            # Detectar automáticamente el tipo de media del primer archivo
+            first_file = media_files[0]
+            file_extension = first_file.name.lower().split('.')[-1]
+            image_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp']
+            video_extensions = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'webm']
+            
+            if file_extension in image_extensions:
+                media_type = 'image'
+            elif file_extension in video_extensions:
+                media_type = 'video'
+            else:
+                return JsonResponse({
+                    'error': f'Formato de archivo no soportado: {file_extension}'
+                }, status=400)
             
             # Validar que el tipo de media sea correcto según la categoría
             if category in ['alfabeto', 'numeros'] and media_type != 'image':
@@ -256,31 +316,63 @@ def api_sign_standards(request):
                     'error': 'Para departamentos y saludos solo se permiten videos'
                 }, status=400)
             
+            # Validar que todos los archivos sean del mismo tipo
+            for file in media_files:
+                ext = file.name.lower().split('.')[-1]
+                if media_type == 'image' and ext not in image_extensions:
+                    return JsonResponse({
+                        'error': 'Todos los archivos deben ser del mismo tipo (imágenes)'
+                    }, status=400)
+                if media_type == 'video' and ext not in video_extensions:
+                    return JsonResponse({
+                        'error': 'Todos los archivos deben ser del mismo tipo (videos)'
+                    }, status=400)
+            
             # Crear o actualizar el estándar
             standard, created = SignStandard.objects.update_or_create(
                 exercise_id=exercise_id,
                 category=category,
                 media_type=media_type,
                 defaults={
-                    'media_file': media_file,
                     'description': description,
                     'is_active': True
                 }
             )
             
+            # Obtener información de variantes (mano, descripción, orden)
+            created_files = []
+            for idx, media_file in enumerate(media_files):
+                hand_pref = request.POST.get(f'hand_preference_{idx}', 'ambas')
+                variant_desc = request.POST.get(f'variant_description_{idx}', '').strip()
+                
+                standard_media = SignStandardMedia.objects.create(
+                    standard=standard,
+                    media_file=media_file,
+                    hand_preference=hand_pref,
+                    variant_description=variant_desc,
+                    order=idx
+                )
+                created_files.append({
+                    'id': standard_media.id,
+                    'url': standard_media.media_file.url,
+                    'hand_preference': standard_media.get_hand_preference_display(),
+                    'variant_description': standard_media.variant_description
+                })
+            
             return JsonResponse({
                 'status': 'ok',
-                'message': 'Estándar creado' if created else 'Estándar actualizado',
+                'message': f'Estándar creado con {len(created_files)} archivo(s)' if created else f'Estándar actualizado con {len(created_files)} archivo(s)',
                 'standard': {
                     'id': standard.id,
                     'exercise_id': standard.exercise_id,
                     'category': standard.category,
                     'media_type': standard.media_type,
-                    'media_url': standard.media_file.url
+                    'files': created_files
                 }
             })
         except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
+            import traceback
+            return JsonResponse({'error': f'Error: {str(e)}\n{traceback.format_exc()}'}, status=500)
 
 
 @login_required

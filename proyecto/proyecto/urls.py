@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path
+from django.shortcuts import redirect
 from manitas import views
 
 from django.contrib.auth import views as auth_views
@@ -9,7 +10,19 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    # Rutas personalizadas de admin DEBEN ir ANTES de admin.site.urls
+    # para evitar que el catch-all del admin las capture
+    path('admin/upload_samples/', views.upload_samples, name='upload_samples'),
+    path('admin/train-signs/', views.admin_train_signs, name='admin_train_signs'),
+    path('admin/senales-de-tren/', views.admin_train_signs, name='admin_train_signs_es'),  # URL alternativa en español
+    
+    # Admin de Django (debe ir después de las rutas personalizadas)
     path('admin/', admin.site.urls),
+    
+    # Redirect para evitar errores 404 cuando el navegador busca recursos automáticos
+    path('train-signs/', lambda request: redirect('admin_train_signs'), name='train_signs_redirect'),
+    
+    # Rutas principales
     path('',views.home, name='home'),
     path('home/', views.home, name="home"),
     path('diccionario/', views.diccionario_visual, name="diccionario_visual"),
@@ -27,8 +40,6 @@ urlpatterns = [
     path('leccion4/', views.leccion4, name='leccion4'),
 
     path('ejercicios/', views.ejercicios, name='ejercicios'),
-    path('admin/upload_samples/', views.upload_samples, name='upload_samples'),
-    path('admin/train-signs/', views.admin_train_signs, name='admin_train_signs'),
     path('api/sign-standards/', views.api_sign_standards, name='api_sign_standards'),
     path('media/sign-video/<int:standard_id>/', views.serve_sign_video, name='serve_sign_video'),
 

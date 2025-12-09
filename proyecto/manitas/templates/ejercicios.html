@@ -40,7 +40,8 @@
     </div>
 
     <!-- Sección de Reconocimiento de Señas con Cámara -->
-    <div class="card shadow-lg mb-4" style="background-color: #D6E6F2;">
+    <div class="card shadow-lg mb-4" style="background-color: #D6E6F2;" 
+         data-is-admin="{% if user.is_staff %}true{% else %}false{% endif %}">
       <div class="card-body p-4">
         <h3 class="fw-bold text-center mb-4" style="color: #303481;">
           <i class="bi bi-camera-video-fill"></i> Ejercicios de Reconocimiento de Señas
@@ -61,16 +62,13 @@
         <div id="exercise-info" class="text-center mb-4" style="display: none;">
           <h4 class="fw-bold" style="color: #471396;" id="exercise-title">Preparando ejercicio...</h4>
           <p class="lead" id="exercise-description"></p>
-          <!-- Área para mostrar estándar de referencia (solo imagen para usuarios normales) -->
-          <div id="standard-reference" class="mt-3 mb-3" style="display: none;">
+          <!-- Área para mostrar estándar de referencia (OCULTA - solo se usa como base) -->
+          <div id="standard-reference" class="mt-3 mb-3" style="display: none !important;">
             <p class="small text-muted"><strong>Referencia:</strong></p>
             <img id="standard-image" src="" alt="Referencia" style="max-width: 200px; border-radius: 8px; display: none;">
             <video id="standard-video" controls style="max-width: 300px; border-radius: 8px; display: none;">
               Tu navegador no soporta videos.
             </video>
-          </div>
-          <div class="alert alert-light mt-3">
-            <small><i class="bi bi-info-circle"></i> <strong>Consejo:</strong> Asegurate de tener buena iluminación y mostrar tu mano completa frente a la cámara. Mantené la seña por 2 segundos para que se detecte correctamente.</small>
           </div>
         </div>
 
@@ -91,10 +89,10 @@
           <div class="col-md-6">
             <div class="mb-3">
               <button id="btn-start-camera" class="btn btn-success w-100 mb-2" disabled>
-                <i class="bi bi-camera-video-fill"></i> Iniciar Cámara
+                <i class="bi bi-camera-video-fill"></i> Iniciar 
               </button>
               <button id="btn-stop-camera" class="btn btn-danger w-100 mb-2" disabled>
-                <i class="bi bi-stop-circle-fill"></i> Detener Cámara
+                <i class="bi bi-stop-circle-fill"></i> Detener 
               </button>
             </div>
             
@@ -103,19 +101,34 @@
             </div>
             
             <div class="mt-3">
-              <h5 class="fw-bold" style="color: #303481;">Progreso:</h5>
-              <div class="progress mb-2" style="height: 25px;">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="fw-bold mb-0" style="color: #303481;">
+                  <i class="bi bi-trophy"></i> Progreso
+                </h5>
+                <span class="badge bg-morado" style="background: linear-gradient(90deg, #471396, #B13BFF); color: white;">
+                  <span id="completed-count">0</span>/<span id="total-count">0</span>
+                </span>
+              </div>
+              <div class="progress mb-2" style="height: 30px; border-radius: 15px; background-color: #e9ecef;">
                 <div id="progress-bar" class="progress-bar" role="progressbar" 
-                     style="width: 0%; background: linear-gradient(90deg, #471396, #B13BFF);">
-                  <span id="progress-text">0%</span>
+                     style="width: 0%; background: linear-gradient(90deg, #471396, #B13BFF); border-radius: 15px; transition: width 0.3s ease;"
+                     aria-valuenow="0" 
+                     aria-valuemin="0" 
+                     aria-valuemax="100">
+                  <span id="progress-text" class="fw-bold" style="line-height: 30px;">0%</span>
                 </div>
               </div>
-              <p class="small text-muted">Ejercicios completados: <span id="completed-count">0</span> / <span id="total-count">0</span></p>
+              <p class="small text-muted text-center mb-0">
+                <i class="bi bi-info-circle"></i> Tu progreso se guarda automáticamente
+              </p>
             </div>
             
-            <div class="mt-3">
-              <button id="btn-next-exercise" class="btn btn-morado w-100" disabled>
-                Siguiente Ejercicio
+            <div class="mt-3 d-flex gap-2">
+              <button id="btn-prev-exercise" class="btn btn-outline-secondary flex-fill" disabled>
+                <i class="bi bi-arrow-left"></i> Anterior
+              </button>
+              <button id="btn-next-exercise" class="btn btn-morado flex-fill" disabled>
+                Siguiente <i class="bi bi-arrow-right"></i>
               </button>
             </div>
           </div>
@@ -154,8 +167,11 @@
     }
     
     // Establecer si el usuario es admin
+    var exerciseCard = document.querySelector('[data-is-admin]');
+    var isUserAdmin = exerciseCard && exerciseCard.getAttribute('data-is-admin') === 'true';
+    
     if (window.reconocimientoSenas) {
-      window.reconocimientoSenas.isAdmin = {% if user.is_staff %}true{% else %}false{% endif %};
+      window.reconocimientoSenas.isAdmin = isUserAdmin;
     }
   });
 </script>

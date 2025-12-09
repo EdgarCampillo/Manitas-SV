@@ -58,7 +58,7 @@
 
     <!-- Vista previa de la imagen -->
     <div class="text-center">
-      {% if perfil.image %}
+      {% if perfil.image and perfil.image.name != 'img/perfil.png' %}
         <img id="preview-image" src="{{ perfil.image.url }}" alt="Foto actual" class="profile-image-preview">
       {% else %}
         <img id="preview-image" src="{% static 'img/perfil.png' %}" alt="Foto por defecto" class="profile-image-preview">

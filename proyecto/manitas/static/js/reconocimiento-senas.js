@@ -13,9 +13,10 @@ class ReconocimientoSenas {
         this.currentExerciseIndex = 0;
         this.detectionInterval = null;
         this.lastDetection = null;
-        this.confidenceThreshold = 0.7;
+        this.confidenceThreshold = 0.6; // 60% de similaridad requerida
         this.signStandards = {}; // Almacenar estándares cargados desde el servidor
         this.isAdmin = false; // Se establecerá desde el template
+        this.lastCorrectDetection = false; // Para cambiar color cuando se detecta correctamente
         
         // Estado para entrenamiento y clasificación cliente-side
         this.samples = {};
@@ -118,28 +119,6 @@ class ReconocimientoSenas {
                 category: 'numeros'
             });
         }
-        for (let i = 20; i <= 100; i += 10) {
-            exercises.push({
-                id: `NUM_${i}`,
-                name: `Número ${i}`,
-                description: `Hacé la seña del número ${i}`,
-                category: 'numeros'
-            });
-        }
-        exercises.push(
-            {
-                id: 'NUM_1000',
-                name: 'Número 1000',
-                description: 'Hacé la seña del número 1000',
-                category: 'numeros'
-            },
-            {
-                id: 'NUM_1000000',
-                name: 'Número 1,000,000',
-                description: 'Hacé la seña del número 1,000,000',
-                category: 'numeros'
-            }
-        );
         return exercises;
     }
     
@@ -268,6 +247,7 @@ class ReconocimientoSenas {
         const btnStart = document.getElementById('btn-start-camera');
         const btnStop = document.getElementById('btn-stop-camera');
         const btnNext = document.getElementById('btn-next-exercise');
+        const btnPrev = document.getElementById('btn-prev-exercise');
         const categorySelect = document.getElementById('category-select');
         
         if (btnStart) {
@@ -278,6 +258,9 @@ class ReconocimientoSenas {
         }
         if (btnNext) {
             btnNext.addEventListener('click', () => this.nextExercise());
+        }
+        if (btnPrev) {
+            btnPrev.addEventListener('click', () => this.prevExercise());
         }
         if (categorySelect) {
             categorySelect.addEventListener('change', (e) => this.selectCategory(e.target.value));
@@ -298,15 +281,27 @@ class ReconocimientoSenas {
         
         this.currentCategory = categoryId;
         this.exercises = this.categories[categoryId].exercises;
-        this.currentExerciseIndex = 0;
         this.lastDetection = null;
         
         // Cargar estándares desde el servidor
         await this.loadStandardsForCategory(categoryId);
         
+        // Intentar cargar progreso guardado para esta categoría
+        const savedProgress = this.loadProgress(categoryId);
+        const startIndex = savedProgress !== null ? savedProgress : 0;
+        
+        this.currentExerciseIndex = startIndex;
+        
         exerciseInfo.style.display = 'block';
         if (btnStart) btnStart.disabled = false;
-        this.loadExercise(0);
+        
+        // Mostrar información sobre entrenamiento
+        const trainingInfo = document.getElementById('training-info');
+        if (trainingInfo) {
+            trainingInfo.style.display = 'block';
+        }
+        
+        this.loadExercise(startIndex);
     }
     
     async loadStandardsForCategory(categoryId) {
@@ -321,11 +316,19 @@ class ReconocimientoSenas {
                 }
             });
             
-            // Almacenar nuevos estándares
+            // Almacenar nuevos estándares con todos sus archivos
             if (data.standards) {
                 data.standards.forEach(std => {
                     const key = `${std.category}_${std.exercise_id}`;
-                    this.signStandards[key] = std;
+                    this.signStandards[key] = {
+                        id: std.id,
+                        exercise_id: std.exercise_id,
+                        category: std.category,
+                        media_type: std.media_type,
+                        media_url: std.media_url,
+                        description: std.description,
+                        media_files: std.media_files || []  // Incluir todos los archivos
+                    };
                 });
             }
         } catch (error) {
@@ -334,6 +337,10 @@ class ReconocimientoSenas {
     }
 
     loadExercise(index) {
+        if (index < 0) {
+            index = 0;
+        }
+        
         if (index >= this.exercises.length) {
             this.showCompletion();
             return;
@@ -347,46 +354,27 @@ class ReconocimientoSenas {
         document.getElementById('total-count').textContent = this.exercises.length;
         document.getElementById('completed-count').textContent = index;
         
-        document.getElementById('btn-next-exercise').disabled = true;
+        // Habilitar/deshabilitar botones de navegación
+        const btnNext = document.getElementById('btn-next-exercise');
+        const btnPrev = document.getElementById('btn-prev-exercise');
+        
+        if (btnNext) btnNext.disabled = true;
+        if (btnPrev) btnPrev.disabled = (index === 0);
+        
         this.updateProgress();
         
-        // Mostrar estándar de referencia si existe
+        // Guardar progreso
+        this.saveProgress();
+        
+        // Ocultar estándar de referencia (solo se usa como base)
         this.displayStandardReference();
     }
     
     displayStandardReference() {
+        // Las referencias están ocultas - solo se usan como base para el reconocimiento
+        // No se muestran visualmente al usuario
         const standardRef = document.getElementById('standard-reference');
-        const standardImg = document.getElementById('standard-image');
-        const standardVideo = document.getElementById('standard-video');
-        
-        if (!this.currentExercise || !this.currentCategory) {
-            standardRef.style.display = 'none';
-            return;
-        }
-        
-        const key = `${this.currentCategory}_${this.currentExercise.id}`;
-        const standard = this.signStandards[key];
-        
-        if (!standard) {
-            standardRef.style.display = 'none';
-            return;
-        }
-        
-        standardRef.style.display = 'block';
-        
-        if (standard.media_type === 'image' && standard.media_url) {
-            standardImg.src = standard.media_url;
-            standardImg.style.display = 'block';
-            standardVideo.style.display = 'none';
-            standardVideo.src = '';
-        } else if (standard.media_type === 'video' && this.isAdmin && standard.id) {
-            // Solo admins pueden ver videos - usar la ruta protegida
-            standardVideo.src = `/media/sign-video/${standard.id}/`;
-            standardVideo.style.display = 'block';
-            standardImg.style.display = 'none';
-            standardImg.src = '';
-        } else {
-            // Usuario normal intentando ver video - ocultar
+        if (standardRef) {
             standardRef.style.display = 'none';
         }
     }
@@ -648,26 +636,34 @@ class ReconocimientoSenas {
                     this.trainingCollecting = false;
                     this.trainingBuffer = [];
                     const statusEl = document.getElementById('detection-status');
-                    if (statusEl) {
+                    if (statusEl && this.isAdmin) {
+                        // Solo mostrar mensaje de muestra guardada para admins
                         statusEl.className = 'alert alert-success text-center';
-                        statusEl.innerHTML = `<i class="bi bi-check-circle-fill"></i> Muestra guardada para ${this.trainingLabel}`;
+                        statusEl.innerHTML = `<i class="bi bi-check-circle-fill"></i> Muestra guardada para ${this.trainingLabel} (solo visible para admin)`;
                     }
                 } else {
                     const statusEl = document.getElementById('detection-status');
-                    if (statusEl) {
+                    if (statusEl && this.isAdmin) {
+                        // Solo mostrar progreso de recolección para admins
                         statusEl.className = 'alert alert-info text-center';
                         statusEl.innerHTML = `<i class="bi bi-hourglass-split"></i> Recolectando muestra ${this.trainingBuffer.length}/${this.trainingFramesToCollect} para ${this.trainingLabel}`;
                     }
                 }
             }
 
-            // Clasificación
+            // Clasificación - SOLO usar muestras de entrenamiento
             let detectedSign = null;
             try {
-                detectedSign = this.classifyFromSamples(landmarks) || this.recognizeSign(landmarks);
+                detectedSign = this.classifyFromSamples(landmarks);
             } catch (e) {
                 console.error('Error en clasificación desde muestras:', e);
-                detectedSign = this.recognizeSign(landmarks);
+                detectedSign = null;
+            }
+
+            // Verificar si la detección es correcta (coincide con el ejercicio actual)
+            this.lastCorrectDetection = false;
+            if (detectedSign && this.currentExercise && detectedSign === this.currentExercise.id) {
+                this.lastCorrectDetection = true;
             }
 
             if (detectedSign) {
@@ -686,12 +682,21 @@ class ReconocimientoSenas {
     }
 
     drawLandmarks(landmarks, handIndex = 0) {
-        const colors = [
-            { stroke: '#00FF00', point: '#00FF00', wrist: '#FF0000' },
-            { stroke: '#00BFFF', point: '#00BFFF', wrist: '#FF1493' }
+        // Colores por defecto: rojo para puntos y líneas
+        const defaultColors = [
+            { stroke: '#FF0000', point: '#FF0000', wrist: '#FF0000' },
+            { stroke: '#FF4444', point: '#FF4444', wrist: '#FF0000' }
         ];
         
-        const color = colors[handIndex % colors.length];
+        // Colores cuando la detección es correcta: verde
+        const successColors = [
+            { stroke: '#00FF00', point: '#00FF00', wrist: '#00FF00' },
+            { stroke: '#00FF88', point: '#00FF88', wrist: '#00FF00' }
+        ];
+        
+        // Usar verde si la última detección fue correcta, sino rojo
+        const colorSet = this.lastCorrectDetection ? successColors : defaultColors;
+        const color = colorSet[handIndex % colorSet.length];
         
         const connections = [
             [0, 1], [1, 2], [2, 3], [3, 4],
@@ -730,74 +735,9 @@ class ReconocimientoSenas {
     recognizeSign(landmarks) {
         if (!this.currentExercise) return null;
         
-        const fingerStates = this.getFingerStates(landmarks);
-        const category = this.currentCategory;
-        const exerciseId = this.currentExercise.id;
-        
-        if (category === 'alfabeto') {
-            return this.recognizeAlphabet(exerciseId, fingerStates, landmarks);
-        } else if (category === 'numeros') {
-            return this.recognizeNumber(exerciseId, fingerStates, landmarks);
-        } else if (category === 'departamentos') {
-            return this.recognizeGeneric(fingerStates, landmarks);
-        } else if (category === 'saludos') {
-            return this.recognizeGreeting(exerciseId, fingerStates, landmarks);
-        }
-        
-        return null;
-    }
-    
-    recognizeAlphabet(letter, fingerStates, landmarks) {
-        switch(letter) {
-            case 'A':
-                return this.recognizeA(fingerStates, landmarks);
-            case 'B':
-                return this.recognizeB(fingerStates, landmarks);
-            case 'C':
-                return this.recognizeC(fingerStates, landmarks);
-            default:
-                return this.recognizeGeneric(fingerStates, landmarks);
-        }
-    }
-    
-    recognizeNumber(numberId, fingerStates, landmarks) {
-        const num = parseInt(numberId.replace('NUM_', ''));
-        
-        if (num >= 1 && num <= 5) {
-            return this.recognizeNumber1to5(num, fingerStates, landmarks);
-        } else if (num >= 6 && num <= 10) {
-            return this.recognizeNumber6to10(num, fingerStates, landmarks);
-        } else {
-            return this.recognizeGeneric(fingerStates, landmarks);
-        }
-    }
-    
-    recognizeNumber1to5(num, fingerStates, landmarks) {
-        let extendedCount = 0;
-        for (let i = 1; i <= 4; i++) {
-            if (fingerStates[i]) extendedCount++;
-        }
-        if (num === extendedCount || (num === 1 && extendedCount === 1 && !fingerStates[0])) {
-            return `NUM_${num}`;
-        }
-        return null;
-    }
-    
-    recognizeNumber6to10(num, fingerStates, landmarks) {
-        return this.recognizeGeneric(fingerStates, landmarks);
-    }
-    
-    recognizeGreeting(greetingId, fingerStates, landmarks) {
-        switch(greetingId) {
-            case 'HOLA':
-                return this.recognizeHola(fingerStates, landmarks);
-            default:
-                return this.recognizeGeneric(fingerStates, landmarks);
-        }
-    }
-    
-    recognizeGeneric(fingerStates, landmarks) {
-        return null;
+        // Usar SOLO el sistema de clasificación basado en muestras de entrenamiento
+        // NO usar lógica hardcodeada
+        return this.classifyFromSamples(landmarks);
     }
 
     getFingerStates(landmarks) {
@@ -819,58 +759,8 @@ class ReconocimientoSenas {
         return states;
     }
 
-    recognizeA(fingerStates, landmarks) {
-        const thumbExtended = fingerStates[0];
-        const indexClosed = !fingerStates[1];
-        const middleClosed = !fingerStates[2];
-        const ringClosed = !fingerStates[3];
-        const pinkyClosed = !fingerStates[4];
-        
-        const thumbTip = landmarks[4];
-        const thumbMcp = landmarks[2];
-        const thumbDistance = Math.abs(thumbTip.x - thumbMcp.x) * this.canvas.width;
-        
-        if (thumbExtended && indexClosed && middleClosed && ringClosed && pinkyClosed && thumbDistance > 20) {
-            return 'A';
-        }
-        return null;
-    }
-
-    recognizeB(fingerStates, landmarks) {
-        const thumbClosed = !fingerStates[0] || (landmarks[4].x < landmarks[3].x);
-        const indexExtended = fingerStates[1];
-        const middleExtended = fingerStates[2];
-        const ringExtended = fingerStates[3];
-        const pinkyExtended = fingerStates[4];
-        
-        if (thumbClosed && indexExtended && middleExtended && ringExtended && pinkyExtended) {
-            return 'B';
-        }
-        return null;
-    }
-
-    recognizeC(fingerStates, landmarks) {
-        if (fingerStates[0] && fingerStates[1]) {
-            const thumbTip = landmarks[4];
-            const indexTip = landmarks[8];
-            const distance = Math.sqrt(
-                Math.pow((thumbTip.x - indexTip.x) * this.canvas.width, 2) +
-                Math.pow((thumbTip.y - indexTip.y) * this.canvas.height, 2)
-            );
-            
-            if (distance > 30 && distance < 100) {
-                return 'C';
-            }
-        }
-        return null;
-    }
-
-    recognizeHola(fingerStates, landmarks) {
-        if (fingerStates[1] && fingerStates[2] && fingerStates[3] && fingerStates[4]) {
-            return 'HOLA';
-        }
-        return null;
-    }
+    // Métodos de reconocimiento hardcodeado ELIMINADOS
+    // Ahora todo el reconocimiento se basa en los estándares y muestras de entrenamiento
 
     handleDetection(detectedSign) {
         const now = Date.now();
@@ -916,27 +806,111 @@ class ReconocimientoSenas {
 
     showError() {
         const statusEl = document.getElementById('detection-status');
-        statusEl.className = 'alert alert-warning text-center';
-        statusEl.innerHTML = `
-            <i class="bi bi-exclamation-triangle-fill"></i> 
-            Intentá de nuevo. Asegurate de hacer la seña correctamente.
-        `;
+        const labels = Object.keys(this.samples || {});
+        const currentLabel = this.currentExercise ? this.currentExercise.id : null;
+        const hasSamples = labels.length > 0 && (currentLabel ? this.samples[currentLabel]?.length > 0 : false);
+        
+        if (!hasSamples && currentLabel) {
+            statusEl.className = 'alert alert-warning text-center';
+            if (this.isAdmin) {
+                statusEl.innerHTML = `
+                    <i class="bi bi-exclamation-triangle-fill"></i> 
+                    <strong>Este ejercicio aún no ha sido entrenado.</strong><br>
+                    <small>Para que el sistema reconozca "${this.currentExercise.name}", necesitás entrenarlo primero:</small><br>
+                    <small>1. Presioná <kbd>Ctrl+Shift+S</kbd> para abrir el panel de admin</small><br>
+                    <small>2. Ingresá el label: <strong>${currentLabel}</strong></small><br>
+                    <small>3. Hacé clic en "Grabar muestra" y realizá la seña varias veces (mínimo 5 veces recomendado)</small>
+                `;
+            } else {
+                statusEl.innerHTML = `
+                    <i class="bi bi-info-circle-fill"></i> 
+                    <strong>Este ejercicio aún no está disponible.</strong><br>
+                    <small>El sistema necesita ser entrenado por un administrador para reconocer "${this.currentExercise.name}".</small>
+                `;
+            }
+        } else {
+            statusEl.className = 'alert alert-warning text-center';
+            statusEl.innerHTML = `
+                <i class="bi bi-exclamation-triangle-fill"></i> 
+                Intentá de nuevo. Asegurate de hacer la seña correctamente según el estándar mostrado.
+            `;
+        }
     }
 
     nextExercise() {
         this.lastDetection = null;
+        this.lastCorrectDetection = false; // Resetear el color a rojo
         document.getElementById('btn-next-exercise').disabled = true;
         
         this.loadExercise(this.currentExerciseIndex + 1);
         document.getElementById('detection-status').className = 'alert alert-info text-center';
         document.getElementById('detection-status').innerHTML = '<i class="bi bi-info-circle"></i> Mostrá tu seña';
     }
+    
+    prevExercise() {
+        this.lastDetection = null;
+        this.lastCorrectDetection = false; // Resetear el color a rojo
+        
+        if (this.currentExerciseIndex > 0) {
+            this.loadExercise(this.currentExerciseIndex - 1);
+            document.getElementById('detection-status').className = 'alert alert-info text-center';
+            document.getElementById('detection-status').innerHTML = '<i class="bi bi-info-circle"></i> Mostrá tu seña';
+        }
+    }
+    
+    saveProgress() {
+        if (!this.currentCategory) return;
+        
+        try {
+            const progressKey = `manitas_exercise_progress_${this.currentCategory}`;
+            const progressData = {
+                category: this.currentCategory,
+                exerciseIndex: this.currentExerciseIndex,
+                exerciseId: this.currentExercise ? this.currentExercise.id : null,
+                timestamp: Date.now()
+            };
+            localStorage.setItem(progressKey, JSON.stringify(progressData));
+        } catch (e) {
+            console.error('Error guardando progreso:', e);
+        }
+    }
+    
+    loadProgress(categoryId) {
+        try {
+            const progressKey = `manitas_exercise_progress_${categoryId}`;
+            const saved = localStorage.getItem(progressKey);
+            if (saved) {
+                const progressData = JSON.parse(saved);
+                // Verificar que la categoría coincida y que el índice sea válido
+                if (progressData.category === categoryId && 
+                    progressData.exerciseIndex >= 0 && 
+                    progressData.exerciseIndex < this.categories[categoryId].exercises.length) {
+                    return progressData.exerciseIndex;
+                }
+            }
+        } catch (e) {
+            console.error('Error cargando progreso:', e);
+        }
+        return null;
+    }
 
     updateProgress() {
         const completed = parseInt(document.getElementById('completed-count').textContent) || 0;
-        const progress = (completed / this.exercises.length) * 100;
-        document.getElementById('progress-bar').style.width = progress + '%';
-        document.getElementById('progress-text').textContent = Math.round(progress) + '%';
+        const total = this.exercises.length || 1;
+        const progress = (completed / total) * 100;
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        
+        if (progressBar) {
+            progressBar.style.width = progress + '%';
+            progressBar.setAttribute('aria-valuenow', progress);
+        }
+        if (progressText) {
+            progressText.textContent = Math.round(progress) + '%';
+        }
+        
+        // Guardar progreso actualizado
+        this.saveProgress();
     }
 
     showCompletion() {
@@ -1038,7 +1012,20 @@ class ReconocimientoSenas {
     classifyFromSamples(landmarks) {
         if (!landmarks) return null;
         const labels = Object.keys(this.samples || {});
-        if (labels.length === 0) return null;
+        
+        // Si no hay muestras de entrenamiento, no se puede reconocer
+        if (labels.length === 0) {
+            return null;
+        }
+        
+        // Verificar que haya muestras para el ejercicio actual
+        if (this.currentExercise) {
+            const currentLabel = this.currentExercise.id;
+            if (!this.samples[currentLabel] || this.samples[currentLabel].length === 0) {
+                // No hay muestras para este ejercicio específico
+                return null;
+            }
+        }
         
         const feat = this.extractFeatures(landmarks);
         const neighbors = [];
@@ -1066,8 +1053,42 @@ class ReconocimientoSenas {
             }
         });
         
-        const score = 1 - (topK[0].dist / (topK[topK.length - 1].dist + 1e-6));
-        if (score >= this.confidenceThreshold) return bestLabel;
+        // Calcular similaridad basada en la distancia mínima
+        // Usar una función que permita 70% de similaridad de forma más flexible
+        const minDist = topK[0].dist;
+        
+        // Calcular el rango de distancias para normalizar
+        // Usar solo las distancias del label más probable para mejor precisión
+        const bestLabelDistances = neighbors
+            .filter(n => n.label === bestLabel)
+            .map(n => n.dist);
+        
+        const avgBestLabelDist = bestLabelDistances.length > 0 
+            ? bestLabelDistances.reduce((sum, d) => sum + d, 0) / bestLabelDistances.length 
+            : minDist;
+        
+        // Calcular similaridad usando una función más flexible
+        // Si la distancia mínima es menor que el promedio del mejor label, es muy similar
+        const distanceRatio = avgBestLabelDist > 0 ? minDist / avgBestLabelDist : 0;
+        
+        // Convertir distancia a similaridad: menor distancia = mayor similaridad
+        // Usar una función que permita 70% de similaridad de forma más natural
+        const similarity = Math.max(0, 1 - (distanceRatio * 1.5)); // Factor 1.5 para hacer más flexible
+        
+        // Aplicar un factor adicional si hay múltiples vecinos del mismo label (mayor confianza)
+        const confidenceBoost = bestCount > 1 ? 0.1 : 0;
+        const finalSimilarity = Math.min(similarity + confidenceBoost, 1);
+        
+        // Solo retornar si la similaridad es al menos 70% (0.7)
+        if (finalSimilarity >= this.confidenceThreshold) {
+            // Verificar que el label reconocido coincida con el ejercicio actual
+            if (this.currentExercise && bestLabel === this.currentExercise.id) {
+                return bestLabel;
+            }
+            // Si no coincide exactamente, pero está cerca, también aceptarlo
+            // (útil para variaciones)
+            return bestLabel;
+        }
         return null;
     }
 
@@ -1101,6 +1122,9 @@ class ReconocimientoSenas {
     }
 
     updateAdminPanelCounts() {
+        // Solo actualizar si es admin y el panel existe
+        if (!this.isAdmin) return;
+        
         const panel = document.getElementById('admin-train-panel');
         if (!panel) return;
         const list = panel.querySelector('#admin-sample-counts');
@@ -1110,12 +1134,18 @@ class ReconocimientoSenas {
         this.exercises.forEach(ex => {
             const cnt = (this.samples[ex.id] || []).length;
             const li = document.createElement('div');
-            li.textContent = `${ex.id}: ${cnt}`;
+            li.textContent = `${ex.id}: ${cnt} muestras`;
             list.appendChild(li);
         });
     }
 
     toggleAdminPanel() {
+        // Solo admins pueden usar el panel de entrenamiento
+        if (!this.isAdmin) {
+            console.warn('Solo administradores pueden acceder al panel de entrenamiento');
+            return;
+        }
+        
         let panel = document.getElementById('admin-train-panel');
         if (!panel) {
             panel = this.createAdminPanel();
@@ -1281,16 +1311,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.warn('No se pudieron cargar muestras persistidas', e);
                 }
 
-                // Atajos y botones
+                // Atajos y botones - Solo para admins
                 document.addEventListener('keydown', (ev) => {
                     if (ev.ctrlKey && ev.shiftKey && ev.code === 'KeyS') {
-                        reconocimiento.toggleAdminPanel();
+                        // Solo permitir si es admin
+                        if (reconocimiento.isAdmin) {
+                            reconocimiento.toggleAdminPanel();
+                        } else {
+                            console.warn('Solo administradores pueden acceder al panel de entrenamiento');
+                        }
                     }
                 });
                 
                 const adminBtn = document.getElementById('btn-admin-train');
-                if (adminBtn) {
+                if (adminBtn && reconocimiento.isAdmin) {
                     adminBtn.addEventListener('click', () => reconocimiento.toggleAdminPanel());
+                } else if (adminBtn) {
+                    // Ocultar el botón si no es admin
+                    adminBtn.style.display = 'none';
                 }
             }
         } else {
