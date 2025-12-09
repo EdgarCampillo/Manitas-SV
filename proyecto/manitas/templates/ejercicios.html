@@ -50,13 +50,16 @@
         <!-- Selector de Categoría -->
         <div class="mb-4">
           <label for="category-select" class="form-label fw-bold" style="color: #303481;">Seleccioná una categoría:</label>
-          <select id="category-select" class="form-select form-select-lg">
-            <option value="">-- Seleccioná una categoría --</option>
-            <option value="alfabeto">Alfabeto</option>
-            <option value="numeros">Números</option>
-            <option value="departamentos">Departamentos de El Salvador</option>
-            <option value="saludos">Saludos Básicos</option>
-          </select>
+          <div class="d-flex align-items-start gap-3 flex-wrap">
+            <select id="category-select" class="form-select form-select-lg" style="min-width: 300px;">
+              <option value="">-- Seleccioná una categoría --</option>
+              <option value="alfabeto">Alfabeto</option>
+              <option value="numeros">Números</option>
+              <option value="departamentos">Departamentos de El Salvador</option>
+              <option value="saludos">Saludos Básicos</option>
+            </select>
+            <div id="category-status-badges" class="d-flex flex-column gap-2" style="flex: 1; min-width: 200px;"></div>
+          </div>
         </div>
         
         <div id="exercise-info" class="text-center mb-4" style="display: none;">

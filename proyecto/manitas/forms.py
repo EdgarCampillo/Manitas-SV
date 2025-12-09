@@ -20,6 +20,17 @@ class RegistroForm(UserCreationForm):
         model = User
         fields = ("nombre_completo", "username", "email", "password1", "password2")
 
+    def clean_email(self):
+        """Valida que el correo electrónico no esté ya en uso"""
+        email = self.cleaned_data.get('email')
+        if email:
+            # Verificar si ya existe un usuario con este correo
+            if User.objects.filter(email=email).exists():
+                raise forms.ValidationError(
+                    "Este correo electrónico ya está siendo usado. Por favor, usá otro correo o iniciá sesión."
+                )
+        return email
+
     def save(self, commit=True):
         user = super().save(commit=False)
         nombre = self.cleaned_data.get("nombre_completo")
@@ -59,13 +70,13 @@ class PerfilForm(forms.ModelForm):
             self.instance = perfil
 
     def save(self, commit=True):
-        Perfil = super().save(commit=False)
-        user = Perfil.user
+        perfil = super().save(commit=False)
+        user = perfil.user
         user.first_name = self.cleaned_data['first_name']   
         user.last_name = self.cleaned_data['last_name']
         user.username = self.cleaned_data['username']
         user.email = self.cleaned_data['email']
         if commit:
             user.save()
-            Perfil.save()
-        return Perfil
+            perfil.save()
+        return perfil

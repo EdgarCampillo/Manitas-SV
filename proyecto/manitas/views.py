@@ -72,9 +72,48 @@ def registrate(request):
         form = RegistroForm()
     return render(request, 'registrate.html', {'form': form})
 
+def oauth_complete_redirect(request):
+    """Vista personalizada para manejar el redirect después del login de OAuth"""
+    if request.user.is_authenticated:
+        # Verificar si es un usuario nuevo de Google
+        if request.session.get('new_google_user'):
+            # Limpiar la flag
+            request.session.pop('new_google_user', None)
+            # Redirigir a completar datos
+            return redirect('registrate_google')
+    # Si no es nuevo o no está autenticado, ir al home
+    return redirect('home')
+
 def registrate_google(request):
+    # Si el usuario ya está autenticado (creado por el pipeline), permitir completar datos
+    if request.user.is_authenticated:
+        user = request.user
+        email = user.email
+        nombre = f"{user.first_name} {user.last_name}".strip() or user.username
+        
+        if request.method == 'POST':
+            form = RegistroForm(request.POST)
+            if form.is_valid():
+                # Actualizar datos del usuario existente
+                user.first_name = form.cleaned_data['nombre_completo'].split(' ', 1)[0]
+                user.last_name = form.cleaned_data['nombre_completo'].split(' ', 1)[1] if len(form.cleaned_data['nombre_completo'].split(' ', 1)) > 1 else ''
+                user.username = form.cleaned_data['username']
+                user.save()
+                messages.success(request, "Perfil completado. ¡Bienvenido a Manitas SV!")
+                return redirect('home')
+        else:
+            form = RegistroForm(initial={
+                'email': email, 
+                'nombre_completo': nombre,
+                'username': user.username
+            })
+        
+        return render(request, 'registrate_google.html', {'form': form})
+    
+    # Si no está autenticado, intentar obtener datos de la sesión
     email = request.session.get('pending_email')
     nombre = request.session.get('pending_nombre')
+    
     if not email:
         return redirect('registrate')
 
@@ -99,28 +138,16 @@ def registrate_google(request):
 def perfil_view(request):
     user = request.user
     perfil, created = Perfil.objects.get_or_create(user=user)
-    
-    # Si el perfil fue recién creado y no tiene imagen, establecer la imagen por defecto
-    if created and not perfil.image:
-        perfil.image = 'img/perfil.png'
-        perfil.save()
 
     if request.method == 'POST':
         form = PerfilForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             form.save()
-            # Asegurar que si no hay imagen, usar la por defecto
+            # Refrescar el perfil después de guardar
             perfil.refresh_from_db()
-            if not perfil.image:
-                perfil.image = 'img/perfil.png'
-                perfil.save()
             return redirect('perfil')
     else:
         form = PerfilForm(instance=user)
-        # Asegurar que si no hay imagen, usar la por defecto
-        if not perfil.image:
-            perfil.image = 'img/perfil.png'
-            perfil.save()
 
     return render(request, 'perfil.html', {'form': form, 'perfil': perfil})
 

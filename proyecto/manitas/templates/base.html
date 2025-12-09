@@ -76,7 +76,7 @@
 <!-- FOTO DE PERFIL EN ESQUINA -->
 {% if user.is_authenticated %}
 <div class="user-profile-trigger" onclick="toggleUserPanel()">
-  {% if user.perfil.image %}
+  {% if user.perfil.image and user.perfil.image.name %}
     <img src="{{ user.perfil.image.url }}" alt="Foto de perfil" class="user-profile-pic">
   {% else %}
     <img src="{% static 'img/perfil.png' %}" alt="Foto de perfil" class="user-profile-pic">
@@ -91,7 +91,7 @@
     <h5 class="flex-grow-1 text-center m-0">Perfil</h5>
   </div>
   <div class="user-panel-body d-flex flex-column align-items-center text-center">
-    {% if user.perfil.image %}
+    {% if user.perfil.image and user.perfil.image.name %}
       <img src="{{ user.perfil.image.url }}" alt="Foto de perfil" class="user-panel-pic">
     {% else %}
       <img src="{% static 'img/perfil.png' %}" alt="Foto de perfil" class="user-panel-pic">

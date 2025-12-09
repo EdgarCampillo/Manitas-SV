@@ -5,23 +5,16 @@ from .models import Perfil
 
 @receiver(post_save, sender=User)
 def crear_perfil_usuario(sender, instance, created, **kwargs):
+    """Crea un perfil automáticamente cuando se crea un usuario"""
     if created:
-        perfil = Perfil.objects.create(user=instance)
-        # Establecer imagen por defecto si no se proporciona
-        if not perfil.image:
-            perfil.image = 'img/perfil.png'
-            perfil.save()
+        # Crear perfil sin imagen (se mostrará la imagen por defecto en los templates)
+        Perfil.objects.get_or_create(user=instance)
 
 @receiver(post_save, sender=User)
 def guardar_perfil_usuario(sender, instance, **kwargs):
+    """Asegura que el perfil exista cuando se guarda un usuario"""
     try:
-        instance.perfil.save()
-        # Asegurar que siempre haya una imagen (por defecto si no hay)
-        if not instance.perfil.image:
-            instance.perfil.image = 'img/perfil.png'
-            instance.perfil.save()
+        instance.perfil
     except Perfil.DoesNotExist:
-        perfil = Perfil.objects.create(user=instance)
-        if not perfil.image:
-            perfil.image = 'img/perfil.png'
-            perfil.save()
+        # Si no existe perfil, crearlo
+        Perfil.objects.create(user=instance)

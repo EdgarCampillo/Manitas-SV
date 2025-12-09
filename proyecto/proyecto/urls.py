@@ -52,6 +52,7 @@ urlpatterns = [
     path('password_change/done/',auth_views.PasswordChangeDoneView.as_view(template_name='cambiar_password_done.html'),name='password_change_done'),
 
     path('oauth/', include('social_django.urls', namespace='social')),
+    path('oauth-complete/', views.oauth_complete_redirect, name='oauth_complete_redirect'),
     path('registrate_google/', views.registrate_google, name='registrate_google'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

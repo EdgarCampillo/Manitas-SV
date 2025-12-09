@@ -25,7 +25,7 @@ class ReconocimientoSenas {
         this.trainingLabel = null;
         this.trainingBuffer = [];
         this.trainingFramesToCollect = 12;
-        this.trainingDuration = 30; // 30 segundos para saludos y departamentos
+        this.trainingDuration = 15; // 15 segundos para saludos y departamentos
         this.trainingStartTime = null;
         this.trainingInterval = null;
         this.knnK = 3;
@@ -374,6 +374,11 @@ class ReconocimientoSenas {
         if (categorySelect) {
             categorySelect.addEventListener('change', (e) => this.selectCategory(e.target.value));
         }
+        
+        // Inicializar estados de categorías al cargar
+        setTimeout(() => {
+            this.updateCategoryStatuses();
+        }, 500);
     }
     
     async selectCategory(categoryId) {
@@ -385,6 +390,7 @@ class ReconocimientoSenas {
             this.exercises = [];
             this.currentCategory = null;
             if (btnStart) btnStart.disabled = true;
+            this.updateCategoryStatuses(); // Actualizar estados cuando no hay categoría seleccionada
             return;
         }
         
@@ -413,6 +419,9 @@ class ReconocimientoSenas {
         // Actualizar la barra de progreso inmediatamente
         this.loadExercise(startIndex);
         this.updateProgress(); // Forzar actualización inmediata
+        
+        // Actualizar estados de categorías después de cargar
+        this.updateCategoryStatuses();
     }
     
     async waitForMediaPipeReady() {
@@ -734,10 +743,15 @@ class ReconocimientoSenas {
         this.currentExerciseIndex = index;
         this.currentExercise = this.exercises[index];
         
-        document.getElementById('exercise-title').textContent = this.currentExercise.name;
-        document.getElementById('exercise-description').textContent = this.currentExercise.description;
-        document.getElementById('total-count').textContent = this.exercises.length;
-        document.getElementById('completed-count').textContent = index;
+        const exerciseTitle = document.getElementById('exercise-title');
+        const exerciseDescription = document.getElementById('exercise-description');
+        const totalCountEl = document.getElementById('total-count');
+        const completedCountEl = document.getElementById('completed-count');
+        
+        if (exerciseTitle) exerciseTitle.textContent = this.currentExercise.name;
+        if (exerciseDescription) exerciseDescription.textContent = this.currentExercise.description;
+        if (totalCountEl) totalCountEl.textContent = this.exercises.length;
+        if (completedCountEl) completedCountEl.textContent = index;
         
         // Habilitar/deshabilitar botones de navegación
         const btnNext = document.getElementById('btn-next-exercise');
@@ -746,6 +760,7 @@ class ReconocimientoSenas {
         if (btnNext) btnNext.disabled = true;
         if (btnPrev) btnPrev.disabled = (index === 0);
         
+        // Actualizar progreso inmediatamente
         this.updateProgress();
         
         // Guardar progreso
@@ -1040,7 +1055,7 @@ class ReconocimientoSenas {
                 const isTimeBasedCategory = this.currentCategory === 'saludos' || this.currentCategory === 'departamentos';
                 
                 if (isTimeBasedCategory) {
-                    // Para saludos y departamentos: usar tiempo (30 segundos)
+                    // Para saludos y departamentos: usar tiempo (15 segundos)
                     this.trainingBuffer.push(feat);
                     const elapsed = (Date.now() - this.trainingStartTime) / 1000;
                     const remaining = Math.max(0, this.trainingDuration - elapsed);
@@ -1213,25 +1228,31 @@ class ReconocimientoSenas {
     }
 
     showSuccess() {
-        if (!document.getElementById('btn-next-exercise').disabled) {
+        const btnNext = document.getElementById('btn-next-exercise');
+        if (!btnNext || !btnNext.disabled) {
             return;
         }
 
         const statusEl = document.getElementById('detection-status');
-        statusEl.className = 'alert alert-success text-center';
-        statusEl.innerHTML = `
-            <i class="bi bi-check-circle-fill"></i> 
-            <strong>¡Correcto!</strong> Hiciste bien la seña de ${this.currentExercise.name} 🎉
-        `;
+        if (statusEl) {
+            statusEl.className = 'alert alert-success text-center';
+            statusEl.innerHTML = `
+                <i class="bi bi-check-circle-fill"></i> 
+                <strong>¡Correcto!</strong> Hiciste bien la seña de ${this.currentExercise.name} 🎉
+            `;
+        }
 
         setTimeout(() => {
-            document.getElementById('btn-next-exercise').disabled = false;
+            if (btnNext) btnNext.disabled = false;
         }, 2000);
 
         this.playSuccessSound();
         
-        const completed = parseInt(document.getElementById('completed-count').textContent) + 1;
-        document.getElementById('completed-count').textContent = completed;
+        const completedCountEl = document.getElementById('completed-count');
+        if (completedCountEl) {
+            const completed = parseInt(completedCountEl.textContent) + 1;
+            completedCountEl.textContent = completed;
+        }
         this.updateProgress();
     }
 
@@ -1305,9 +1326,17 @@ class ReconocimientoSenas {
             };
             localStorage.setItem(progressKey, JSON.stringify(progressData));
             
-            // Si la categoría está completada, marcarla como tal
+            // Si la categoría está completada, marcarla como tal (pero preservar el progreso)
             if (this.currentExerciseIndex >= this.exercises.length) {
                 localStorage.setItem(completedKey, 'true');
+            } else {
+                // Si no está completada, asegurarse de que el flag de completado no esté presente
+                // pero preservar el progreso existente
+                const existingCompleted = localStorage.getItem(completedKey);
+                // Solo remover el flag si realmente no está completada
+                if (existingCompleted === 'true' && this.currentExerciseIndex < this.exercises.length) {
+                    localStorage.removeItem(completedKey);
+                }
             }
         } catch (e) {
             console.error('Error guardando progreso:', e);
@@ -1326,9 +1355,9 @@ class ReconocimientoSenas {
                 // Verificar que la categoría coincida y que el índice sea válido
                 if (progressData.category === categoryId && 
                     progressData.exerciseIndex >= 0) {
-                    // Si está completada, mantener el último índice
+                    // Si está completada, mantener el último índice pero permitir continuar
                     if (isCompleted && progressData.exerciseIndex >= this.categories[categoryId].exercises.length) {
-                        return this.categories[categoryId].exercises.length - 1; // Mantener en el último ejercicio
+                        return this.categories[categoryId].exercises.length; // Permitir ver el estado completado
                     }
                     // Si no está completada pero el índice es válido, usarlo
                     if (progressData.exerciseIndex < this.categories[categoryId].exercises.length) {
@@ -1341,11 +1370,132 @@ class ReconocimientoSenas {
         }
         return null;
     }
+    
+    getCategoryStatus(categoryId) {
+        if (!categoryId || !this.categories[categoryId]) {
+            return null;
+        }
+        
+        try {
+            const progressKey = `manitas_exercise_progress_${categoryId}`;
+            const completedKey = `manitas_category_completed_${categoryId}`;
+            const saved = localStorage.getItem(progressKey);
+            const isCompleted = localStorage.getItem(completedKey) === 'true';
+            const totalExercises = this.categories[categoryId].exercises.length;
+            
+            if (!saved) {
+                return { status: 'faltante', progress: 0, total: totalExercises };
+            }
+            
+            const progressData = JSON.parse(saved);
+            const currentIndex = progressData.exerciseIndex || 0;
+            
+            if (isCompleted || currentIndex >= totalExercises) {
+                return { status: 'terminada', progress: totalExercises, total: totalExercises };
+            } else if (currentIndex > 0) {
+                return { status: 'en_proceso', progress: currentIndex, total: totalExercises };
+            } else {
+                return { status: 'faltante', progress: 0, total: totalExercises };
+            }
+        } catch (e) {
+            console.error('Error obteniendo estado de categoría:', e);
+            return { status: 'faltante', progress: 0, total: this.categories[categoryId].exercises.length };
+        }
+    }
+    
+    updateCategoryStatuses() {
+        const badgesContainer = document.getElementById('category-status-badges');
+        if (!badgesContainer) return;
+        
+        badgesContainer.innerHTML = '';
+        
+        const categorySelect = document.getElementById('category-select');
+        if (!categorySelect) return;
+        
+        const categories = ['alfabeto', 'numeros', 'departamentos', 'saludos'];
+        
+        categories.forEach(categoryId => {
+            const status = this.getCategoryStatus(categoryId);
+            if (!status) return;
+            
+            const categoryItem = document.createElement('div');
+            categoryItem.className = 'd-flex align-items-center gap-2';
+            categoryItem.style.marginBottom = '5px';
+            
+            const categoryName = document.createElement('span');
+            categoryName.textContent = this.categories[categoryId].name + ':';
+            categoryName.style.fontWeight = '500';
+            categoryName.style.minWidth = '180px';
+            categoryItem.appendChild(categoryName);
+            
+            const badge = document.createElement('span');
+            let statusText = '';
+            let badgeClass = '';
+            
+            if (status.status === 'terminada') {
+                statusText = 'Terminada';
+                badgeClass = 'bg-success';
+            } else if (status.status === 'en_proceso') {
+                statusText = 'En proceso';
+                badgeClass = 'bg-warning text-dark';
+            } else {
+                statusText = 'Faltante';
+                badgeClass = 'bg-secondary';
+            }
+            
+            badge.className = `badge ${badgeClass}`;
+            badge.textContent = statusText;
+            badge.style.cursor = 'default';
+            categoryItem.appendChild(badge);
+            
+            // Si está terminada, agregar botón de reiniciar
+            if (status.status === 'terminada') {
+                const restartBtn = document.createElement('button');
+                restartBtn.className = 'btn btn-sm btn-outline-danger';
+                restartBtn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Reiniciar';
+                restartBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    if (confirm(`¿Reiniciar la categoría "${this.categories[categoryId].name}"?`)) {
+                        this.restartCategoryById(categoryId);
+                    }
+                };
+                categoryItem.appendChild(restartBtn);
+            }
+            
+            badgesContainer.appendChild(categoryItem);
+        });
+    }
+    
+    restartCategoryById(categoryId) {
+        if (!categoryId || !this.categories[categoryId]) return;
+        
+        // Limpiar progreso guardado
+        try {
+            const progressKey = `manitas_exercise_progress_${categoryId}`;
+            const completedKey = `manitas_category_completed_${categoryId}`;
+            localStorage.removeItem(progressKey);
+            localStorage.removeItem(completedKey);
+        } catch (e) {
+            console.error('Error limpiando progreso:', e);
+        }
+        
+        // Si es la categoría actual, reiniciarla también
+        if (this.currentCategory === categoryId) {
+            this.restartCategory();
+        } else {
+            // Actualizar estados visuales
+            this.updateCategoryStatuses();
+        }
+    }
 
     updateProgress() {
+        if (!this.currentCategory || !this.exercises || this.exercises.length === 0) {
+            return;
+        }
+        
         const completed = parseInt(document.getElementById('completed-count').textContent) || 0;
         const total = this.exercises.length || 1;
-        const progress = (completed / total) * 100;
+        const progress = Math.min((completed / total) * 100, 100);
         const progressBar = document.getElementById('progress-bar');
         const progressText = document.getElementById('progress-text');
         const completedCountEl = document.getElementById('completed-count');
@@ -1362,6 +1512,8 @@ class ReconocimientoSenas {
         if (progressBar) {
             progressBar.style.width = progress + '%';
             progressBar.setAttribute('aria-valuenow', progress);
+            // Forzar repaint para actualización inmediata
+            progressBar.offsetHeight;
         }
         if (progressText) {
             progressText.textContent = Math.round(progress) + '%';
@@ -1369,35 +1521,47 @@ class ReconocimientoSenas {
         
         // Guardar progreso actualizado
         this.saveProgress();
+        
+        // Actualizar estados de categorías
+        this.updateCategoryStatuses();
     }
 
     showCompletion() {
         const categoryName = this.currentCategory ? this.categories[this.currentCategory]?.name || this.currentCategory : 'la categoría';
+        const exerciseInfo = document.getElementById('exercise-info');
         
-        document.getElementById('exercise-info').innerHTML = `
-            <div class="text-center">
-                <div class="mb-4">
-                    <i class="bi bi-check-circle-fill" style="font-size: 4rem; color: #28a745;"></i>
+        if (exerciseInfo) {
+            exerciseInfo.innerHTML = `
+                <div class="text-center">
+                    <div class="mb-4">
+                        <i class="bi bi-check-circle-fill" style="font-size: 4rem; color: #28a745;"></i>
+                    </div>
+                    <h3 class="fw-bold" style="color: #471396;">🎉 ¡Felicitaciones!</h3>
+                    <p class="lead">Completaste todos los ejercicios de <strong>${categoryName}</strong></p>
+                    <div class="mt-4">
+                        <button class="btn btn-morado btn-lg me-2" onclick="window.reconocimientoSenas.restartCategory()">
+                            <i class="bi bi-arrow-clockwise"></i> Reiniciar Categoría
+                        </button>
+                        <button class="btn btn-outline-secondary btn-lg" onclick="document.getElementById('category-select').value = ''; document.getElementById('category-select').dispatchEvent(new Event('change'));">
+                            <i class="bi bi-list"></i> Cambiar Categoría
+                        </button>
+                    </div>
                 </div>
-                <h3 class="fw-bold" style="color: #471396;">🎉 ¡Felicitaciones!</h3>
-                <p class="lead">Completaste todos los ejercicios de <strong>${categoryName}</strong></p>
-                <div class="mt-4">
-                    <button class="btn btn-morado btn-lg me-2" onclick="window.reconocimientoSenas.restartCategory()">
-                        <i class="bi bi-arrow-clockwise"></i> Reiniciar Categoría
-                    </button>
-                    <button class="btn btn-outline-secondary btn-lg" onclick="document.getElementById('category-select').value = ''; document.getElementById('category-select').dispatchEvent(new Event('change'));">
-                        <i class="bi bi-list"></i> Cambiar Categoría
-                    </button>
-                </div>
-            </div>
-        `;
+            `;
+        }
         
-        document.getElementById('detection-status').className = 'alert alert-success text-center';
-        document.getElementById('detection-status').innerHTML = '<i class="bi bi-trophy-fill"></i> ¡Categoría completada!';
+        const detectionStatus = document.getElementById('detection-status');
+        if (detectionStatus) {
+            detectionStatus.className = 'alert alert-success text-center';
+            detectionStatus.innerHTML = '<i class="bi bi-trophy-fill"></i> ¡Categoría completada!';
+        }
         
         // Actualizar barra de progreso al 100%
         const progressBar = document.getElementById('progress-bar');
         const progressText = document.getElementById('progress-text');
+        const completedCountEl = document.getElementById('completed-count');
+        const totalCountEl = document.getElementById('total-count');
+        
         if (progressBar) {
             progressBar.style.width = '100%';
             progressBar.setAttribute('aria-valuenow', 100);
@@ -1405,23 +1569,33 @@ class ReconocimientoSenas {
         if (progressText) {
             progressText.textContent = '100%';
         }
+        if (completedCountEl && totalCountEl) {
+            completedCountEl.textContent = this.exercises.length;
+            totalCountEl.textContent = this.exercises.length;
+        }
         
         // Deshabilitar botones de navegación
         const btnNext = document.getElementById('btn-next-exercise');
         const btnPrev = document.getElementById('btn-prev-exercise');
         if (btnNext) btnNext.disabled = true;
         if (btnPrev) btnPrev.disabled = true;
+        
+        // Guardar progreso como completado
+        this.saveProgress();
+        
+        // Actualizar estados de categorías
+        this.updateCategoryStatuses();
     }
     
     restartCategory() {
         if (!this.currentCategory) return;
         
-        // Limpiar progreso guardado pero mantener el estado de completado
+        // Limpiar progreso guardado
         try {
             const progressKey = `manitas_exercise_progress_${this.currentCategory}`;
             const completedKey = `manitas_category_completed_${this.currentCategory}`;
             localStorage.removeItem(progressKey);
-            localStorage.removeItem(completedKey); // También limpiar el estado de completado
+            localStorage.removeItem(completedKey);
         } catch (e) {
             console.error('Error limpiando progreso:', e);
         }
@@ -1440,6 +1614,9 @@ class ReconocimientoSenas {
             statusEl.className = 'alert alert-info text-center';
             statusEl.innerHTML = '<i class="bi bi-info-circle"></i> Categoría reiniciada. Iniciá la cámara para comenzar.';
         }
+        
+        // Actualizar estados de categorías
+        this.updateCategoryStatuses();
     }
 
     playSuccessSound() {
